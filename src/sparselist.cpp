@@ -14,6 +14,7 @@
 
 #include <vector>
 #include <utility>
+#include <boost/shared_ptr.hpp>
 class SparseList {
    private:
 	  uint64_t res;
@@ -24,6 +25,7 @@ class SparseList {
 	  uint64_t indexof(double index);
    public:
 
+	  typedef boost::shared_ptr<SparseList>  Ptr;
 	  // inline public methods
 	  SparseList(double minval, double maxval, uint64_t res){
 		 this->minval=minval;
@@ -48,6 +50,9 @@ class SparseList {
 	  double get(const uint64_t index);
 	  void insert(const double index, const double value);
 	  void clear(const double from, const double to);
+	  void clear(){
+		 this->list.clear();
+	  }
 	  void toArray(double* index, double* values);
 	  void toArray(double* index, double* values, double start);
 }

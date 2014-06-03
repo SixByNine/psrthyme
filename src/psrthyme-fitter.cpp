@@ -8,14 +8,54 @@
 #include "psrthyme-fitter.hpp"
 
 #if INTERFACE
+#include <vector>
+#include <list>
 class PsrthymeFitter {
+   private:
+	  struct Itteration{
+		 uint64_t resolution;
+		 bool cholesky;
+		 bool zoom;
+		 Itteration(uint64_t resolution, bool cholesky, bool zoom){
+			this->resolution = resolution;
+			this->cholesky = cholesky;
+			this->zoom = zoom;
+		 }
+	  };
+	  PsrthymeTemplate::Ptr tmpl;
+	  SparseList::Ptr chisq_space;
+	  std::list<Itteration> itterations;
    public:
-	  PsrthymeFitter(); // constructor
-}
+	  PsrthymeFitter() {
+		 this->useDefaults();
+	  } 
+	  void setTemplate(PsrthymeTemplate::Ptr tmpl){
+		 this->tmpl = tmpl;
+	  }
+	  void useDefaults(){
+		 this->clear();
+		 this->itterations.push_front(Itteration(32,true,true));
+		 this->itterations.push_front(Itteration(8,true,true));
+		 this->itterations.push_front(Itteration(1,true,false));
+		 this->itterations.push_front(Itteration(1,true,false));
+		 this->itterations.push_front(Itteration(1,false,false));
+	  }
+	  void clear(){
+		 this->itterations.clear();
+		 this->chisq_space->clear();
+	  }
+	  void addItteration(uint64_t res, bool cholesky, bool zoom){
+		 this->itterations.push_back(Itteration(res,cholesky,zoom));
+	  }
+	  bool run();
+};
 
 #endif
 
-PsrthymeFitter::PsrthymeFitter() {
 
+
+bool PsrthymeFitter::run(){
+
+
+   return true;
 }
-

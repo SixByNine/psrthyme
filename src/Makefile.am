@@ -16,11 +16,13 @@ libpsrthyme_la_LIBADD =@TEMPO2_LIBS@
 
 cppfiles = psrthyme-template.cpp psrthyme-fitter.cpp \
 		   psrthyme-component.cpp psrthyme-profile.cpp \
-		   sparselist.cpp VonMisesComponent.cpp
+		   sparselist.cpp VonMisesComponent.cpp \
+		   psrthyme-result.cpp psrthyme-observation.cpp
 hppfiles = psrthyme-main.hpp \
 		   psrthyme-template.hpp psrthyme-fitter.hpp \
 		   psrthyme-component.hpp psrthyme-profile.hpp \
 		   sparselist.hpp VonMisesComponent.hpp
+		   psrthyme-result.hpp psrthyme-observation.hpp
 
 cfiles = 
 hfiles =
