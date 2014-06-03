@@ -7,6 +7,7 @@
 #ifdef __MACH__
 #define clockid_t int
 #endif
+#define STREQ(a,b) (strcmp(a,b)==0)
 
 typedef struct mjk_clock{
    time_t s;

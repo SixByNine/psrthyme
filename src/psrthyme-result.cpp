@@ -10,6 +10,7 @@
 #if INTERFACE
 #include <vector>
 #include <list>
+#include <boost/shared_ptr.hpp>
 class PsrthymeResult {
    private:
 	  SparseList::Ptr chisq_space;
@@ -18,8 +19,11 @@ class PsrthymeResult {
 	  std::vector<double> amplitudes;
 	  double phase;
 	  double error;
+	  bool success;
    public:
+	  typedef boost::shared_ptr<PsrthymeResult> Ptr;
 	  PsrthymeResult() {
+		 success=false;
 	  } 
 };
 

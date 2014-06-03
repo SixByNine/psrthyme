@@ -19,10 +19,10 @@ mjk_clock_t *init_clock();
 int getI(const char *lo,const char *so,int argc,char **argv,int val);
 double getF(const char *lo,const char *so,int argc,char **argv,double val);
 char getB(const char *lo,const char *so,int argc,char **argv,char val);
-#define STREQ(a,b) (strcmp(a,b)==0)
 const char *getS(const char *lo,const char *so,int argc,char **argv,const char *val);
 void getArgs(int *argc,char **argv);
 #if defined(__MACH__)
 int clock_gettime(int clk_id,struct timespec *t);
 #endif
+#define STREQ(a,b) (strcmp(a,b)==0)
 #define INTERFACE 0

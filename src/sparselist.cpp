@@ -46,6 +46,8 @@ class SparseList {
 	  }
 
 	  // library methods
+	  double min();
+	  double max();
 	  double get(const double index);
 	  double get(const uint64_t index);
 	  void insert(const double index, const double value);
@@ -67,6 +69,31 @@ uint64_t SparseList::indexof(const double index){
 	  if(abs(this->list[i].first - index) < diff){
 		 diff=fabs(this->list[i].first - index);
 		 best_idx=i;
+	  }
+   }
+   return best_idx;
+}
+
+
+double SparseList::min(){
+   double diff = std::numeric_limits<double>::max();
+   double best_idx=0;
+   for (uint64_t i = 0; i < this->list.size(); i++){
+	  if(this->list[i].second < diff){
+		 diff=this->list[i].second;
+		 best_idx=this->list[i].first;
+	  }
+   }
+   return best_idx;
+}
+
+double SparseList::max(){
+   double diff = -std::numeric_limits<double>::max();
+   double best_idx=0;
+   for (uint64_t i = 0; i < this->list.size(); i++){
+	  if(this->list[i].second > diff){
+		 diff=this->list[i].second;
+		 best_idx=this->list[i].first;
 	  }
    }
    return best_idx;

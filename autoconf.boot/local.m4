@@ -34,15 +34,15 @@ AC_ARG_ENABLE([psrhome],
               [Don't use packages in $PSRHOME/packages/$LOGIN_ARCH]))
 
 if test -n "$PSRHOME" ; then
-if test -d $PSRHOME/packages/$LOGIN_ARCH -a x"$enable_psrhome" != x"no"; then
-  CPPFLAGS="-I$PSRHOME/packages/$LOGIN_ARCH/include $CPPFLAGS"
-  LDFLAGS="-L$PSRHOME/packages/$LOGIN_ARCH/lib $LDFLAGS"
-fi
+   if test -d $PSRHOME/packages/$LOGIN_ARCH -a x"$enable_psrhome" != x"no"; then
+	 CPPFLAGS="-I$PSRHOME/packages/$LOGIN_ARCH/include $CPPFLAGS"
+	 LDFLAGS="-L$PSRHOME/packages/$LOGIN_ARCH/lib $LDFLAGS"
+   fi
 
-if test -d $PSRHOME/$LOGIN_ARCH -a x"$enable_psrhome" != x"no"; then
-  CPPFLAGS="-I$PSRHOME/$LOGIN_ARCH/include $CPPFLAGS"
-  LDFLAGS="-L$PSRHOME/$LOGIN_ARCH/lib $LDFLAGS"
-fi
+   if test -d $PSRHOME/$LOGIN_ARCH -a x"$enable_psrhome" != x"no"; then
+	 CPPFLAGS="-I$PSRHOME/$LOGIN_ARCH/include $CPPFLAGS"
+	 LDFLAGS="-L$PSRHOME/$LOGIN_ARCH/lib $LDFLAGS"
+   fi
 fi
 
 ])
