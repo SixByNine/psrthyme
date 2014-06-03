@@ -25,6 +25,9 @@ hppfiles = psrthyme-main.hpp \
 cfiles = 
 hfiles =
 makeheaders_files=util.h.in mjklog.h.in $(cppfiles) $(cfiles) $(psrthyme_SOURCES) 
+BUILT_SOURCES=$(hppfiles) psrthyme.h
+clean-local:
+	rm $(BUILT_SOURCES)
 
 if HAVE_PGPLOT
 cppfiles += psrthyme-plotter.cpp
@@ -47,6 +50,7 @@ psrthyme.h: makeheaders $(makeheaders_files)
 	./makeheaders -H $(makeheaders_files) > psrthyme.h
 headerfiles: makeheaders $(makeheaders_files)
 	./makeheaders psrthyme-main.cpp $(makeheaders_files)
+
 
 $(hppfiles): headerfiles
 $(hfiles): headerfiles

@@ -1,0 +1,11 @@
+Makefile.in
+Makefile
+/aclocal.m4
+/config.*
+/configure
+/config
+/libtool
+/src/.deps/
+/autoconf/
+/autom4te.cache/
+/stamp-h1
