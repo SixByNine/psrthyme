@@ -1,0 +1,6 @@
+
+#define STREQ(a,b) (strcmp(a,b)==0)
+
+#define LOGDBG std::cout
+#define LOGMSG std::cout
+#define LOGERR std::cout
