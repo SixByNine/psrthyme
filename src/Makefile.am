@@ -7,25 +7,25 @@ if HAVE_CFITSIO
 endif
 
 psrthyme_LDADD=libpsrthyme.la
-psrthyme_SOURCES=psrthyme-main.cpp mjk_cmd.c
+psrthyme_SOURCES=PsrthymeMain.cpp mjk_cmd.c
 
 AM_CPPFLAGS=-I./boost/
 
 libpsrthyme_la_CFLAGS = -fPIC @T2TOOLKIT_CFLAGS@ 
 libpsrthyme_la_LIBADD =@T2TOOLKIT_LIBS@ 
 
-cppfiles = psrthyme-template.cpp psrthyme-fitter.cpp \
-		   psrthyme-component.cpp psrthyme-profile.cpp \
+cppfiles = PsrthymeTemplate.cpp PsrthymeFitter.cpp \
+		   PsrthymeComponent.cpp PsrthymeProfile.cpp \
 		   sparselist.cpp VonMisesComponent.cpp \
-		   psrthyme-result.cpp psrthyme-observation.cpp \
-		   psrthyme-matrix.cpp debug.cpp
+		   PsrthymeResult.cpp PsrthymeObservation.cpp \
+		   PsrthymeMatrix.cpp debug.cpp
 
-hppfiles = psrthyme-main.hpp \
-		   psrthyme-template.hpp psrthyme-fitter.hpp \
-		   psrthyme-component.hpp psrthyme-profile.hpp \
+hppfiles = PsrthymeMain.hpp \
+		   PsrthymeTemplate.hpp PsrthymeFitter.hpp \
+		   PsrthymeComponent.hpp PsrthymeProfile.hpp \
 		   sparselist.hpp VonMisesComponent.hpp \
-		   psrthyme-result.hpp psrthyme-observation.hpp \
-		   psrthyme-matrix.hpp debug.hpp
+		   PsrthymeResult.hpp PsrthymeObservation.hpp \
+		   PsrthymeMatrix.hpp debug.hpp
 
 cfiles = 
 hfiles =
@@ -35,8 +35,8 @@ clean-local:
 	rm $(BUILT_SOURCES)
 
 if HAVE_PGPLOT
-cppfiles += psrthyme-plotter.cpp
-hppfiles += psrthyme-plotter.hpp
+cppfiles += PsrthymePlotter.cpp
+hppfiles += PsrthymePlotter.hpp
 libpsrthyme_la_CFLAGS += @PGPLOT_CFLAGS@ 
 libpsrthyme_la_LIBADD +=@PGPLOT_LIBS@ 
 endif
@@ -54,7 +54,7 @@ endif
 psrthyme.h: makeheaders $(makeheaders_files)
 	./makeheaders -H $(makeheaders_files) > psrthyme.h
 headerfiles: makeheaders $(makeheaders_files)
-	./makeheaders psrthyme-main.cpp $(makeheaders_files)
+	./makeheaders PsrthymeMain.cpp $(makeheaders_files)
 
 
 $(hppfiles): headerfiles

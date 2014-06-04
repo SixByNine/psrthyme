@@ -5,7 +5,7 @@
 #include <inttypes.h>
 #include <cpgplot.h>
 
-#include "psrthyme-main.hpp"
+#include "PsrthymeMain.hpp"
 
 
 int main(int argc, char** argv){
