@@ -10,9 +10,19 @@
 
 int main(int argc, char** argv){
 
-   PsrthymeTemplate::Ptr tmpl = PsrthymeTemplate::read("/Users/mkeith/Projects/kwikfit_tests/0525/mjk.tmpl");
+   PsrthymeTemplate::Ptr tmpl = PsrthymeTemplate::read("../../kwikfit/examples/psr1.tmpl");
 
    tmpl->write(std::cout);
+
+   PsrthymeObservation::Ptr obs = PsrthymeObservation::Ptr(new PsrthymeObservation("../../kwikfit/examples/psr1.asc"));
+		 obs->read();
+
+   PsrthymeFitter::Ptr fitter = PsrthymeFitter::Ptr(new PsrthymeFitter());
+   //fitter->clear();
+   //fitter->addItteration(1,false,false);
+   fitter->setTemplate(tmpl);
+
+   fitter->fitTo(obs);
 
    return 0;
 }

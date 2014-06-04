@@ -1,0 +1,4 @@
+#!/bin/bash
+
+rm src/*.hpp `find . -name Makefile.in` `find . -name Makefile` `find . -name '*.o' -or -name '*.lo'` config.h* configure aclocal.m4
+rm -rf autoconf autom4te.cache `find . -name '.libs'`

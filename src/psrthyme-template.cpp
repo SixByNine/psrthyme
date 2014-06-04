@@ -24,7 +24,7 @@ class PsrthymeTemplate : public std::vector<PsrthymeProfile::Ptr>{
 	  typedef boost::shared_ptr<PsrthymeTemplate>  Ptr;
 	  static PsrthymeTemplate::Ptr read(const char* filename);
 	  void read(std::istream &infile);
-
+	  PsrthymeMatrix::Ptr getDesignMatrix(uint64_t nbins, double offset_phase);
 	  void write(std::ostream &out);
 	  void addProfile(PsrthymeProfile::Ptr profile){
 		 this->push_back(profile);
@@ -111,4 +111,18 @@ void PsrthymeTemplate::write(std::ostream &out){
    }
 
    out << "# END    \t"<<this->name << std::endl;
+}
+
+PsrthymeMatrix::Ptr PsrthymeTemplate::getDesignMatrix(uint64_t nbins,double offset_phase){
+   PsrthymeMatrix::Ptr dm = PsrthymeMatrix::Ptr(new PsrthymeMatrix(nbins,this->size()+1));
+   for (uint64_t ibin=0; ibin < nbins; ibin++){
+	  double phase = double(ibin)/double(nbins) - offset_phase;
+	  if(phase > 0.5)phase-=1.0;
+	  if(phase < -0.5)phase+=1.0;
+	  for (uint64_t iProf=0; iProf < this->size(); iProf++){
+		 (*dm)[ibin][iProf] = this->at(iProf)->getValue(phase);
+	  }
+   }
+
+   return dm;
 }

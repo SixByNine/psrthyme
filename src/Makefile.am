@@ -11,21 +11,21 @@ psrthyme_SOURCES=psrthyme-main.cpp mjk_cmd.c
 
 AM_CPPFLAGS=-I./boost/
 
-libpsrthyme_la_CFLAGS = -fPIC @TEMPO2_CFLAGS@ 
-libpsrthyme_la_LIBADD =@TEMPO2_LIBS@ 
+libpsrthyme_la_CFLAGS = -fPIC @T2TOOLKIT_CFLAGS@ 
+libpsrthyme_la_LIBADD =@T2TOOLKIT_LIBS@ 
 
 cppfiles = psrthyme-template.cpp psrthyme-fitter.cpp \
 		   psrthyme-component.cpp psrthyme-profile.cpp \
 		   sparselist.cpp VonMisesComponent.cpp \
 		   psrthyme-result.cpp psrthyme-observation.cpp \
-		   psrthyme-matrix.cpp
+		   psrthyme-matrix.cpp debug.cpp
 
 hppfiles = psrthyme-main.hpp \
 		   psrthyme-template.hpp psrthyme-fitter.hpp \
 		   psrthyme-component.hpp psrthyme-profile.hpp \
 		   sparselist.hpp VonMisesComponent.hpp \
 		   psrthyme-result.hpp psrthyme-observation.hpp \
-		   psrthyme-matrix.hpp
+		   psrthyme-matrix.hpp debug.hpp
 
 cfiles = 
 hfiles =

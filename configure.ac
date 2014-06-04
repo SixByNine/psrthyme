@@ -54,10 +54,10 @@ AC_CHECK_LIB(m, cos)
 SWIN_LOCAL
 
 
-SWIN_LIB_TEMPO2
+MJK_LIB_T2TOOLKIT
 
-if test x"$have_tempo2" != xyes; then
-   AC_ERROR(The TEMPO2 library was not found. Cannot build.)
+if test x"$have_t2toolkit" != xyes; then
+   AC_ERROR(The TEMPO2 toolkit library was not found. Cannot build.)
 fi
 
 SWIN_LIB_PGPLOT
