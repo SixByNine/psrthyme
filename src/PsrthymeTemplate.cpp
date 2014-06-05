@@ -116,7 +116,9 @@ void PsrthymeTemplate::write(std::ostream &out){
 PsrthymeMatrix::Ptr PsrthymeTemplate::getDesignMatrix(uint64_t nbins,double offset_phase){
    PsrthymeMatrix::Ptr dm = PsrthymeMatrix::Ptr(new PsrthymeMatrix(nbins,this->size()+1));
    for (uint64_t ibin=0; ibin < nbins; ibin++){
-	  double phase = double(ibin)/double(nbins) - offset_phase;
+	  // We reference the leading edge of the bin as phase 0
+	  // so add half a bin to get to centre of a bin
+	  double phase = (double(ibin)+0.5)/double(nbins) - offset_phase;
 	  if(phase > 0.5)phase-=1.0;
 	  if(phase < -0.5)phase+=1.0;
 	  for (uint64_t iProf=0; iProf < this->size(); iProf++){

@@ -145,7 +145,7 @@ PsrthymeResult::Ptr PsrthymeFitter::fitTo(PsrthymeObservation::Ptr obs){
 	  chisq_space->setResolution(nphase_steps);
 
 	  for(uint64_t iphase = 0; iphase < nphase_steps; iphase++){
-		 double phase = double(iphase)/double(nphase_steps);
+		 double phase = double(iphase)/double(nphase_steps); 
 		 if(!itr.zoom || chisq_space->get(phase) < chisq_cut){
 			// we want to re-do this bin!
 			uint64_t ibin = iphase/itr.resolution;
