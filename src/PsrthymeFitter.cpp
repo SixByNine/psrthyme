@@ -99,14 +99,16 @@ PsrthymeResult::Ptr PsrthymeFitter::fitTo(PsrthymeObservation::Ptr obs){
    PsrthymeMatrix::Ptr bestCVM = PsrthymeMatrix::Ptr(new PsrthymeMatrix(nfit));
    boost::shared_ptr<double[]> bestP(new double[nfit]);
    boost::shared_ptr<double[]> bestErr(new double[nfit]);
-   
+
    const double tol = 1.0e-27;
 
    SparseList::Ptr chisq_space = SparseList::Ptr(new SparseList(0,1,8));
    chisq_space->insert(0,1e99);
 
-	  double best_chisq = std::numeric_limits<double>::max();
-	  double best_phase = 0;
+   double best_chisq = std::numeric_limits<double>::max();
+   double best_phase = 0;
+
+   std::vector<double> cov;
    while(ittrs.size() > 0){
 	  Itteration itr = ittrs.front();
 	  ittrs.pop_front();
@@ -128,25 +130,27 @@ PsrthymeResult::Ptr PsrthymeFitter::fitTo(PsrthymeObservation::Ptr obs){
 	  LOGDBG << "Alloc UINV " << std::endl;
 	  LOGDBG << "Get covar function" << std::endl;
 	  PsrthymeMatrix::Ptr covMatrix = PsrthymeMatrix::Ptr(new PsrthymeMatrix(nbins));
-	  std::vector<double> cov = getCovarianceFunction(residuals);
-	  logmsg("var(data) = %lf",cov[0]);
-
-
+	  cov = getCovarianceFunction(residuals);
+	  logdbg("var(data) = %lf",cov[0]);
 	  if (itr.cholesky) {
+		 cov[0]*=(1+1e-4);
 		 covMatrix->addCVF(cov);
-		 covMatrix->addDiagonal(cov[0]*1e-9);
 	  } else {
 		 covMatrix->addDiagonal(cov[0]);
 	  }
 
+	  logdbg("cut = %lf",chisq_cut);
 	  PsrthymeMatrix::Ptr uinv = PsrthymeMatrix::Ptr(new PsrthymeMatrix(nbins));
 	  cholesky_formUinv(uinv->c_arr(),covMatrix->c_arr(), nbins);
+
 
 	  chisq_space->setResolution(nphase_steps);
 
 	  for(uint64_t iphase = 0; iphase < nphase_steps; iphase++){
 		 double phase = double(iphase)/double(nphase_steps); 
+		 if(phase > 0.5)phase-=1.0;
 		 if(!itr.zoom || chisq_space->get(phase) < chisq_cut){
+			logdbg("%lf %lf",phase,chisq_space->get(phase));
 			// we want to re-do this bin!
 			uint64_t ibin = iphase/itr.resolution;
 			uint64_t sbin = iphase-ibin*itr.resolution;
@@ -179,7 +183,7 @@ PsrthymeResult::Ptr PsrthymeFitter::fitTo(PsrthymeObservation::Ptr obs){
 				  nbins,nfit,tol,1,arr(outP),arr(outErr),outCVM->c_arr());
 			chisq_space->insert(phase,chisq);
 			if(chisq < best_chisq) {
-			   logmsg("phase %lf chisq %lg",phase,chisq);
+			   logdbg("phase %lf chisq %lg",phase,chisq);
 			   best_profile = (*designMatricies[sbin])*outP;
 			   std::rotate(best_profile.begin(),best_profile.end()-ibin,best_profile.end());
 			   best_chisq = chisq;
@@ -192,7 +196,7 @@ PsrthymeResult::Ptr PsrthymeFitter::fitTo(PsrthymeObservation::Ptr obs){
 	  }
 
 	  std::transform(obs->profile.begin(), obs->profile.end(),
-			best_profile.begin(), residuals.begin(), absdiff);
+			best_profile.begin(), residuals.begin(), diff);
    }
 
    double error_estimate=0;
@@ -203,11 +207,16 @@ PsrthymeResult::Ptr PsrthymeFitter::fitTo(PsrthymeObservation::Ptr obs){
    result->amp_values = std::vector<double>(arr(bestP),arr(bestP)+nfit);
    result->amp_errors = std::vector<double>(arr(bestErr),arr(bestErr)+nfit);
    result->amp_cvm = bestCVM;
+   result->data_cov = cov;
    result->phase=best_phase;
    result->error=error_estimate;
+   result->residual = residuals;
+   result->best_profile = best_profile;
+   result->nfree=nbins-nfit-1;
+   result->nfit=nfit;
    return result;
 }
 
-double absdiff(double a, double b){
-   return fabs(a-b);
+double diff(double a, double b){
+   return (a-b);
 }

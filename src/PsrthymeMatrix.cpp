@@ -125,7 +125,7 @@ void PsrthymeMatrix::addCVF(std::vector<double> diag){
 	  for(int64_t j=0;j<this->y; j++){
 		 int64_t k=i-j;
 		 if(k<0)k+=this->x;
-		 this->matrix[i][j] += diag[k];
+		 this->matrix[i][j] = diag[k];
 	  }
    }
 

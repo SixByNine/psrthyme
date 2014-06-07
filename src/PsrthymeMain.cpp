@@ -3,7 +3,7 @@
 #include <config.h>
 #endif
 #include <inttypes.h>
-#include <cpgplot.h>
+#include <TKlog.h>
 
 #include "PsrthymeMain.hpp"
 
@@ -18,11 +18,19 @@ int main(int argc, char** argv){
 		 obs->read();
 
    PsrthymeFitter::Ptr fitter = PsrthymeFitter::Ptr(new PsrthymeFitter());
-   //fitter->clear();
-   //fitter->addItteration(1,false,false);
+   fitter->clear();
+   fitter->addItteration(4,false,false);
+   fitter->addItteration(4,true,false);
+   fitter->addItteration(8,true,true);
+   fitter->addItteration(32,true,true);
+   fitter->addItteration(128,true,true);
    fitter->setTemplate(tmpl);
 
-   fitter->fitTo(obs);
+   PsrthymeResult::Ptr result = fitter->fitTo(obs);
+   PsrthymePlotter plt("2/xs");
+   plt.plot(result);
+   logmsg("PHASE = %lf",result->phase);
+   logmsg("ERROR = %lf",result->error);
 
    return 0;
 }

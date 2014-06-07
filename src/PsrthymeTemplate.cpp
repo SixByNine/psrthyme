@@ -124,6 +124,7 @@ PsrthymeMatrix::Ptr PsrthymeTemplate::getDesignMatrix(uint64_t nbins,double offs
 	  for (uint64_t iProf=0; iProf < this->size(); iProf++){
 		 (*dm)[ibin][iProf] = this->at(iProf)->getValue(phase);
 	  }
+	  (*dm)[ibin][this->size()]=1;
    }
 
    return dm;

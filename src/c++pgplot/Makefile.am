@@ -8,9 +8,9 @@ AM_CPPFLAGS=-I../boost/
 libcxxpgplot_la_CFLAGS = -fPIC @T2TOOLKIT_CFLAGS@ 
 libcxxpgplot_la_LIBADD =@T2TOOLKIT_LIBS@ 
 
-cppfiles = PgPlot.cpp PgPlotPane.cpp PgPlotData.cpp
+cppfiles = PgPlot.cpp PgPlotPane.cpp PgPlotData.cpp PgPlotText.cpp
 
-hppfiles = PgPlot.hpp PgPlotPane.hpp PgPlotData.hpp
+hppfiles = PgPlot.hpp PgPlotPane.hpp PgPlotData.hpp PgPlotText.hpp
 
 makeheaders_files=$(cppfiles) 
 BUILT_SOURCES=$(hppfiles) cxxpgplot.h

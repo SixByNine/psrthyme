@@ -13,17 +13,23 @@
 #include <boost/shared_ptr.hpp>
 class PsrthymeResult {
    public:
+	  typedef boost::shared_ptr<PsrthymeResult> Ptr;
 	  SparseList::Ptr chisq_space;
 	  PsrthymeTemplate::Ptr tmpl;
 	  PsrthymeObservation::Ptr obsn;
 	  std::vector<double> amp_values;
 	  std::vector<double> amp_errors;
+	  std::vector<double> data_cov;
 	  PsrthymeMatrix::Ptr amp_cvm;
+	  uint64_t nfree;
+	  uint64_t nfit;
 	  double phase;
 	  double error;
 	  PsrthymeResult() {
 	  };
-	  typedef boost::shared_ptr<PsrthymeResult> Ptr;
+	  std::vector<double> best_profile;
+	  std::vector<double> residual;
 };
 #endif
+
 

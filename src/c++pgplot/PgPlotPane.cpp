@@ -40,6 +40,7 @@ class PgPlotPane {
 	  std::string ylab;
 	  std::string title;
 	  std::vector<PgPlotData::Ptr> datasets;
+	  std::vector<PgPlotText::Ptr> annotations;
 	  void draw();
 	  void set_xlim(double x0, double x1){
 		 this->auto_xlim=false;
@@ -47,12 +48,11 @@ class PgPlotPane {
 		 this->xlim.second=x1;
 	  }
 	  void set_ylim(double y0, double y1){
-		 this->auto_xlim=false;
-		 this->xlim.first=y0;
-		 this->xlim.second=y1;
+		 this->auto_ylim=false;
+		 this->ylim.first=y0;
+		 this->ylim.second=y1;
 	  }
-
-}
+};
 
 #endif
 
@@ -102,12 +102,12 @@ void PgPlotPane::draw(){
    double ymargin=margin*1.2*0.095*axsize;
    if (!draw_xlab)ymargin=0;
    if (!draw_ylab)xmargin=0;
-   logmsg("X '%s' %d",this->xlab.c_str(),this->xlab.length());
+   logdbg("X '%s' %d",this->xlab.c_str(),this->xlab.length());
    if (this->xlab.length()==0) ymargin/=2.0;
    if (this->ylab.length()==0) xmargin/=2.0;
    if (this->visible) {
-	  logmsg("Plotting x:%lg %lg y:%lg %lg",xlim.first,xlim.second,ylim.first,ylim.second);
-	  logmsg("VP x:%lg %lg y:%lg %lg",x0+xmargin,x0+width,y0+ymargin,y0+height);
+	  logdbg("Plotting x:%lg %lg y:%lg %lg",xlim.first,xlim.second,ylim.first,ylim.second);
+	  logdbg("VP x:%lg %lg y:%lg %lg",x0+xmargin,x0+width,y0+ymargin,y0+height);
 	  cpgsch(this->axsize);
 	  cpgsvp(x0+xmargin,x0+width,y0+ymargin,y0+height);
 	  cpgswin(xlim.first,xlim.second,ylim.first,ylim.second);

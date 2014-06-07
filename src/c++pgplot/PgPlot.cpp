@@ -44,31 +44,33 @@ class PgPlot {
 	  PgPlot(); // constructor
 	  void createGrid(uint64_t nrow, uint64_t ncol);
 	  void show();
+	  void show(std::string device);
 	  PgPlotPane::Ptr getPane(uint64_t r, uint64_t c){
 		 r = nrow-r-1;
 		 //c = ncol-c-1;
 		 this->grid[r][c]->visible = true;
 		 return this->grid[r][c];
 	  }
-void setColWidth(uint64_t col, double width){
-   this->defaultColWidth=this->maxsz*width;
-   for(uint64_t irow = 0; irow< this->nrow; irow++){
-	  this->grid[irow][col]->width=width;
-   }
-   this->fixPanes();
-}
-void setRowHeight(uint64_t row, double height){
-   this->defaultRowHeight=this->maxsz*height;
-   for(uint64_t icol = 0; icol<this->ncol; icol++){
-	  this->grid[row][icol]->height=height;
-   }
-   this->fixPanes();
-}
+	  void setColWidth(uint64_t col, double width){
+		 this->defaultColWidth=this->maxsz*width;
+		 for(uint64_t irow = 0; irow< this->nrow; irow++){
+			this->grid[irow][col]->width=width;
+		 }
+		 this->fixPanes();
+	  }
+	  void setRowHeight(uint64_t row, double height){
+		 row = nrow-row-1;
+		 this->defaultRowHeight=this->maxsz*height;
+		 for(uint64_t icol = 0; icol<this->ncol; icol++){
+			this->grid[row][icol]->height=height;
+		 }
+		 this->fixPanes();
+	  }
 
 
-void setDevice(std::string dev){
-   this->dev = dev;
-}
+	  void setDevice(std::string dev){
+		 this->dev = dev;
+	  }
 
 };
 
@@ -134,7 +136,10 @@ void PgPlot::fixPanes(){
 }
 
 void PgPlot::show(){
-   cpgopen(this->dev.c_str());
+   show(this->dev);
+}
+void PgPlot::show(std::string device){
+   cpgopen(device.c_str());
    cpgeras();
    logmsg("show() nrow=%ld ncol=%ld",this->nrow,this->ncol);
    for(uint64_t irow = 0; irow<this->nrow; irow++){

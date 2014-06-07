@@ -11,7 +11,7 @@ psrthyme_SOURCES=PsrthymeMain.cpp mjk_cmd.c
 
 AM_CPPFLAGS=-I./boost/
 
-libpsrthyme_la_CFLAGS = -fPIC @T2TOOLKIT_CFLAGS@ 
+libpsrthyme_la_CPPFLAGS = $(AM_CPPFLAGS) -fPIC @T2TOOLKIT_CFLAGS@ 
 libpsrthyme_la_LIBADD =@T2TOOLKIT_LIBS@ 
 
 cppfiles = PsrthymeTemplate.cpp PsrthymeFitter.cpp \
@@ -38,8 +38,8 @@ if HAVE_PGPLOT
 SUBDIRS=c++pgplot
 cppfiles += PsrthymePlotter.cpp
 hppfiles += PsrthymePlotter.hpp
-libpsrthyme_la_CFLAGS += @PGPLOT_CFLAGS@ 
-libpsrthyme_la_LIBADD +=@PGPLOT_LIBS@ 
+libpsrthyme_la_CPPFLAGS += @PGPLOT_CFLAGS@ -I./c++pgplot/
+libpsrthyme_la_LIBADD +=@PGPLOT_LIBS@ c++pgplot/libcxxpgplot.la
 endif
 
 libpsrthyme_la_SOURCES = $(hfiles) $(hppfiles) $(cfiles) $(cppfiles)
