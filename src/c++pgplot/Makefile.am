@@ -15,7 +15,7 @@ hppfiles = PgPlot.hpp PgPlotPane.hpp PgPlotData.hpp
 makeheaders_files=$(cppfiles) 
 BUILT_SOURCES=$(hppfiles) cxxpgplot.h
 clean-local:
-	rm $(BUILT_SOURCES)
+	rm -f $(BUILT_SOURCES)
 
 libcxxpgplot_la_SOURCES = $(hfiles) $(hppfiles) $(cfiles) $(cppfiles)
 

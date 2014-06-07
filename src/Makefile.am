@@ -32,9 +32,10 @@ hfiles =
 makeheaders_files=$(cppfiles) $(cfiles) $(psrthyme_SOURCES) util.h.in
 BUILT_SOURCES=$(hppfiles) psrthyme.h
 clean-local:
-	rm $(BUILT_SOURCES)
+	rm -f $(BUILT_SOURCES)
 
 if HAVE_PGPLOT
+SUBDIRS=c++pgplot
 cppfiles += PsrthymePlotter.cpp
 hppfiles += PsrthymePlotter.hpp
 libpsrthyme_la_CFLAGS += @PGPLOT_CFLAGS@ 
