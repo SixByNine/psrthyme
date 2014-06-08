@@ -51,8 +51,7 @@ bool PsrthymeObservation::read(std::istream &in){
    }
    this->nbins = profile.size();
    for(uint64_t ibin=0; ibin<nbins; ibin++){
-	  double iphase = double(ibin)/double(nbins);
-	  if (iphase > 0.5)iphase-=1.0;
+	  double iphase = PsrthymeResult::correctPhase(double(ibin)/double(nbins));
 	  this->phase.push_back(iphase);
    }
    if(this->profile.size() < 4){

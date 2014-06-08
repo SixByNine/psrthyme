@@ -118,9 +118,7 @@ PsrthymeMatrix::Ptr PsrthymeTemplate::getDesignMatrix(uint64_t nbins,double offs
    for (uint64_t ibin=0; ibin < nbins; ibin++){
 	  // We reference the leading edge of the bin as phase 0
 	  // so add half a bin to get to centre of a bin
-	  double phase = (double(ibin)+0.5)/double(nbins) - offset_phase;
-	  if(phase > 0.5)phase-=1.0;
-	  if(phase < -0.5)phase+=1.0;
+	  double phase = PsrthymeResult::correctPhase((double(ibin)+0.5)/double(nbins) - offset_phase);
 	  for (uint64_t iProf=0; iProf < this->size(); iProf++){
 		 (*dm)[ibin][iProf] = this->at(iProf)->getValue(phase);
 	  }

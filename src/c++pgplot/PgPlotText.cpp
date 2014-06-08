@@ -26,7 +26,7 @@ class PgPlotText {
 void PgPlotText::draw(){
    cpgsci(this->colorIndex);
    cpgsch(this->size);
-   cpgptxt(this->x, this->y, this->just, this->angle,this->txt.c_str());
+   cpgptxt(this->x, this->y, this->angle, this->just,this->txt.c_str());
 }
 
 PgPlotText::PgPlotText(std::string txt, double x, double y){
