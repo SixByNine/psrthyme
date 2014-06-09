@@ -18,6 +18,7 @@ class PsrthymeProfile {
    private:
    public:
 	  typedef boost::shared_ptr<PsrthymeProfile> Ptr;
+	  std::string name;
 	  std::vector<double> profile;
 	  std::vector<double> phase;
 	  PsrthymeProfile(const char* name) {
@@ -33,9 +34,6 @@ class PsrthymeProfile {
 
 bool PsrthymeProfile::read(std::istream &in){
    std::string line;
-   this->freq=0;
-   this->imjd=0;
-   this->fmjd=0;
    while (std::getline(in, line)) {
 	  try {
 		 double x = boost::lexical_cast<double>(line); // double could be anything with >> operator.
@@ -58,7 +56,7 @@ bool PsrthymeProfile::read(std::istream &in){
 
 
 bool PsrthymeProfile::read(){
-   std::ifstream in(this->name);
+   std::ifstream in(this->name.c_str());
    return this->read(in);
    in.close();
 }

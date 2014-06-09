@@ -4,6 +4,6 @@ SUBDIRS=.
 if HAVE_PGPLOT
 SUBDIRS+=c++pgplot
 endif
-SUBDIRS+=libpsrthyme
+SUBDIRS+=libpsrthyme programs
 
 
