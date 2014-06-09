@@ -47,8 +47,18 @@ class PsrthymeTelescope {
 			return unknown_telescope;
 		 }
 	  }
+
+	  friend std::ostream& operator<< (std::ostream& ostr, Ptr tel);
+	  std::ostream& operator<< (std::ostream& ostr){
+		 return ostr << this->name;
+	  }
 };
 #endif
+
+std::ostream& operator<< (std::ostream& ostr, PsrthymeTelescope::Ptr tel){
+		 return ostr << tel->name;
+}
+
 
 // initialise these when library is loaded
 std::map<std::string,PsrthymeTelescope::Ptr> PsrthymeTelescope::id2scope;
@@ -92,25 +102,25 @@ void PsrthymeTelescope::setup(){
    }
 
    std::string file = ((t2dir +"/observatory/aliases"));
-std::ifstream obsdat(file.c_str());
-	  std::string line;
-	  while (std::getline(obsdat, line)) {
-		 boost::trim(line);
-		 if (line[0]=='#')continue;
-		 std::vector<std::string> elems;
-		 boost::split(elems,line,boost::is_any_of(" \t"),boost::token_compress_on);
-		 if (elems.size() < 2) continue;
-		 if(PsrthymeTelescope::id2scope.count(elems[0])>0){
-			PsrthymeTelescope::Ptr tel = id2scope[elems[0]];
-			elems.erase(elems.begin());
-			BOOST_FOREACH (std::string id, elems){
-			   tel->id.push_back(id);
-			   PsrthymeTelescope::id2scope[id]=tel;
-			}
+   std::ifstream obsdat(file.c_str());
+   std::string line;
+   while (std::getline(obsdat, line)) {
+	  boost::trim(line);
+	  if (line[0]=='#')continue;
+	  std::vector<std::string> elems;
+	  boost::split(elems,line,boost::is_any_of(" \t"),boost::token_compress_on);
+	  if (elems.size() < 2) continue;
+	  if(PsrthymeTelescope::id2scope.count(elems[0])>0){
+		 PsrthymeTelescope::Ptr tel = id2scope[elems[0]];
+		 elems.erase(elems.begin());
+		 BOOST_FOREACH (std::string id, elems){
+			tel->id.push_back(id);
+			PsrthymeTelescope::id2scope[id]=tel;
 		 }
 	  }
+   }
 
-	  obsdat.close();
+   obsdat.close();
 
 
 }

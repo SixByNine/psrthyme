@@ -98,7 +98,6 @@ AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_FILES([Makefile src/Makefile 
 				 src/c++pgplot/Makefile
 				 src/libpsrthyme/Makefile
-				 src/thymechive/Makefile
 				 src/programs/Makefile])
 
 AC_OUTPUT
@@ -134,7 +133,7 @@ if test X$have_blas = Xyes; then
 fi
 
 if test X$have_psrchive != Xyes; then
-	AC_MSG_WARN(Psrchive not found - very limited functionality will result)
+	AC_MSG_ERROR(Psrchive not found - currently not supported)
 fi
 
 

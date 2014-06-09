@@ -50,16 +50,16 @@ void PsrthymePlotter::plot(PsrthymeResult::Ptr result){
 
    PgPlotData::Ptr profile = PgPlotData::blank();
    mainPlot->datasets.push_back(profile);
-   profile->x = result->obsn->phase;
-   profile->y = result->obsn->profile;
+   profile->x = result->obsn->getPhase();
+   profile->y = result->obsn->getProfile();
 
    PgPlotData::Ptr tmpl = PgPlotData::blank();
-   tmpl->x = result->obsn->phase;
+   tmpl->x = result->obsn->getPhase();
    tmpl->y = result->best_profile;
    mainPlot->datasets.push_back(tmpl);
 
    PgPlotData::Ptr resid = PgPlotData::blank();
-   resid->x = result->obsn->phase;
+   resid->x = result->obsn->getPhase();
    resid->y = result->residual;
    mainPlot->datasets.push_back(resid);
    mainPlot->xlab="Phase";
@@ -78,7 +78,7 @@ void PsrthymePlotter::plot(PsrthymeResult::Ptr result){
    midPlot->datasets.push_back(chisq);
 
    PgPlotData::Ptr cov = PgPlotData::blank();
-   cov->x = result->obsn->phase;
+   cov->x = result->obsn->getPhase();
    cov->y = result->data_cov;
    double cov_min = *std::min_element(cov->y.begin(),cov->y.end());
    double cov_max = *std::max_element(cov->y.begin(),cov->y.end());
@@ -168,8 +168,8 @@ void PsrthymePlotter::plot(PsrthymeResult::Ptr result){
 		 txt->size=0.8;
    }
    midPlot->annotations.push_back(txt);
-   double mx = *std::max_element(result->obsn->profile.begin(), result->obsn->profile.end());
-   double mn = *std::min_element(result->obsn->profile.begin(), result->obsn->profile.end());
+   double mx = *std::max_element(result->obsn->getProfile().begin(), result->obsn->getProfile().end());
+   double mn = *std::min_element(result->obsn->getProfile().begin(), result->obsn->getProfile().end());
    double dy = (mx-mn)/20;
    for (uint64_t i =0; i < result->tmpl->size(); ++i){
 	  format = boost::format("\\(2199) %s %.2f \\(2233) %.2f \\(2199)");

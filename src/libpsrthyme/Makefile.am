@@ -4,8 +4,8 @@ nobase_include_HEADERS=psrthyme.h psrthyme/psrthyme.hpp
 
 AM_CPPFLAGS=-I$(top_srcdir)/src/boost/
 
-libpsrthyme_la_CPPFLAGS = $(AM_CPPFLAGS) -fPIC @T2TOOLKIT_CFLAGS@ 
-libpsrthyme_la_LIBADD =@T2TOOLKIT_LIBS@ 
+libpsrthyme_la_CPPFLAGS = $(AM_CPPFLAGS) -fPIC @T2TOOLKIT_CFLAGS@ @PSRCHIVE_CFLAGS@
+libpsrthyme_la_LIBADD =@T2TOOLKIT_LIBS@ @PSRCHIVE_LIBS@
 
 cppfiles = Psrthyme.cpp \
 		   PsrthymeTemplate.cpp PsrthymeFitter.cpp \

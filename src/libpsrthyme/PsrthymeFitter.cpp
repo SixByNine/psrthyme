@@ -34,6 +34,11 @@ class PsrthymeFitter {
 	  PsrthymeTemplate::Ptr tmpl;
 	  std::list<Itteration> itterations;
    public:
+
+	  static double diff(double a, double b){
+		 return (a-b);
+	  }
+
 	  typedef boost::shared_ptr<PsrthymeFitter> Ptr;
 	  PsrthymeFitter() {
 		 this->useDefaults();
@@ -90,8 +95,8 @@ PsrthymeResult::Ptr PsrthymeFitter::fitTo(PsrthymeProfile::Ptr obs){
    std::list<Itteration> ittrs(this->itterations);
    const uint64_t nbins = obs->getNbins();
    const uint64_t nfit = this->tmpl->size()+1;
-   std::vector<double> residuals(obs->profile);
-   std::vector<double> best_profile(obs->profile);
+   std::vector<double> residuals(obs->getProfile());
+   std::vector<double> best_profile(obs->getProfile());
    LOGDBG << "nit = " << ittrs.size() << std::endl;
    PsrthymeMatrix::Ptr outCVM = PsrthymeMatrix::Ptr(new PsrthymeMatrix(nfit));
    boost::shared_ptr<double[]> outP(new double[nfit]);
@@ -157,7 +162,7 @@ PsrthymeResult::Ptr PsrthymeFitter::fitTo(PsrthymeProfile::Ptr obs){
 			if ( yvals.count(ibin) == 0 ) {
 			   // need to generate the rotated profile
 			   //	   LOGDBG << "make rotprof for "<< ibin << std::endl;
-			   std::vector<double> rotated(obs->profile);
+			   std::vector<double> rotated(obs->getProfile());
 			   std::rotate(rotated.begin(),rotated.begin()+ibin,rotated.end());
 			   white_yvals[ibin] = (*uinv)*rotated;
 			   yvals[ibin] = rotated;
@@ -195,8 +200,8 @@ PsrthymeResult::Ptr PsrthymeFitter::fitTo(PsrthymeProfile::Ptr obs){
 		 }
 	  }
 
-	  std::transform(obs->profile.begin(), obs->profile.end(),
-			best_profile.begin(), residuals.begin(), diff);
+	  std::transform(obs->getProfile().begin(), obs->getProfile().end(),
+			best_profile.begin(), residuals.begin(), PsrthymeFitter::diff);
    }
 
    PsrthymeResult::Ptr result = PsrthymeResult::Ptr(new PsrthymeResult());
@@ -216,7 +221,7 @@ PsrthymeResult::Ptr PsrthymeFitter::fitTo(PsrthymeProfile::Ptr obs){
 
 
    double error_estimate=0;
-// get error estimate
+   // get error estimate
    {
 	  std::vector<double> x,y;
 	  double chisq_mult=2;
@@ -267,10 +272,6 @@ PsrthymeResult::Ptr PsrthymeFitter::fitTo(PsrthymeProfile::Ptr obs){
    result->error=error_estimate;
 
    return result;
-}
-
-double diff(double a, double b){
-   return (a-b);
 }
 
 extern "C" void psrthyme_err_fit(double x, double *v,int m){
