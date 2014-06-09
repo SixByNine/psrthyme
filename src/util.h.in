@@ -1,7 +1,0 @@
-
-#define LOGDBG std::cout
-#define LOGMSG std::cout
-#define LOGERR std::cout
-//#define ENDL <<std::endl
-#define arr(a) &a[0]
-
