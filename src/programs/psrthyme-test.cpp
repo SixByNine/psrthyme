@@ -6,10 +6,23 @@
 #include <TKlog.h>
 
 #include <psrthyme/psrthyme.hpp>
+#include <psrthyme/thymechive.hpp>
 #include "psrthyme-test.hpp"
 
 
 int main(int argc, char** argv){
+   Psrthyme::setup();
+   std::cout << PsrthymeTelescope::getTelescopeFromId("PARKES")->getCode() << std::endl;
+   std::cout << PsrthymeTelescope::getTelescopeFromId("jb")->getCode() << std::endl;
+   std::cout << PsrthymeTelescope::getTelescopeFromId("7")->getCode() << std::endl;
+   std::cout << PsrthymeTelescope::getTelescopeFromId("8")->getCode() << std::endl;
+
+   ThymeChiveArchive::Ptr archive = 
+	  ThymeChiveArchive::Ptr(
+			new ThymeChiveArchive("/Users/mkeith/Projects/AGL/2032+4127/DATA/J100203_183904.FTp"));
+
+   std::cout << archive->get_MJD() << std::endl;
+   exit(1);
 
    PsrthymeTemplate::Ptr tmpl = PsrthymeTemplate::read("../../../kwikfit/examples/psr1.tmpl");
 

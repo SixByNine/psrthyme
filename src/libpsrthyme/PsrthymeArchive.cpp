@@ -13,14 +13,28 @@ class PsrthymeArchive {
    private:
    public:
 	  typedef boost::shared_ptr<PsrthymeArchive> Ptr;
-	  virtual int64_t get_MJD();
-	  virtual uint64_t getStartTime(); // from MJD
-	  virtual uint64_t getNsub();
-	  virtual uint64_t getNbins();
-	  virtual uint64_t getNchans();
-	  virtual uint64_t getNpol();
-	  virtual PsrthymeTelescope getTelescope();
-	  virtual PsrthymeProfile::Ptr getProfile(uint64_t isubint, uint64_t ichan, uint64_t ipol);
+	  virtual int64_t get_MJD()=0;
+	  virtual double getStartTime()=0; // from MJD
+	  virtual uint64_t getNsub()=0;
+	  virtual uint64_t getNbins()=0;
+	  virtual uint64_t getNchans()=0;
+	  virtual uint64_t getNpol()=0;
+	  virtual PsrthymeTelescope::Ptr getTelescope()=0;
+	  virtual PsrthymeProfile::Ptr getProfile(uint64_t isubint, uint64_t ichan, uint64_t ipol)=0;
+
+	  // writ methods
+	  virtual void set_filename(std::string str);
+	  virtual void write();
+	  virtual bool is_writable();
 };
 #endif
 
+void PsrthymeArchive::set_filename(std::string str){
+   return;
+};
+void PsrthymeArchive::write(){
+   return;
+};
+bool PsrthymeArchive::is_writable(){
+   return false;
+}

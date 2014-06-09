@@ -15,6 +15,11 @@ AM_CPPFLAGS=-I$(top_srcdir)/src/libpsrthyme -I$(top_srcdir)/src/boost
 
 LDADD=$(top_builddir)/src/libpsrthyme/libpsrthyme.la $(top_builddir)/src/c++pgplot/libc++pgplot.la
 
+if HAVE_PSRCHIVE
+LDADD+=$(top_builddir)/src/thymechive/libthymechive.la
+AM_CPPFLAGS+=-I$(top_srcdir)/src/thymechive
+endif
+
 headerfiles: $(makeheaders_files)
 	$(top_builddir)/src/makeheaders $(makeheaders_files)
 

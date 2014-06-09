@@ -7,20 +7,21 @@ AM_CPPFLAGS=-I$(top_srcdir)/src/boost/
 libpsrthyme_la_CPPFLAGS = $(AM_CPPFLAGS) -fPIC @T2TOOLKIT_CFLAGS@ 
 libpsrthyme_la_LIBADD =@T2TOOLKIT_LIBS@ 
 
-cppfiles = PsrthymeTemplate.cpp PsrthymeFitter.cpp \
+cppfiles = Psrthyme.cpp \
+		   PsrthymeTemplate.cpp PsrthymeFitter.cpp \
 		   PsrthymeComponent.cpp PsrthymeTemplateSection.cpp \
 		   SparseList.cpp VonMisesComponent.cpp \
 		   PsrthymeResult.cpp PsrthymeProfile.cpp \
 		   PsrthymeTelescope.cpp PsrthymeArchive.cpp \
-		   PsrthymeMatrix.cpp debug.cpp
+		   PsrthymeMatrix.cpp debug.cpp 
 
-hppfiles = PsrthymeMain.hpp \
+hppfiles = Psrthyme.hpp \
 		   PsrthymeTemplate.hpp PsrthymeFitter.hpp \
 		   PsrthymeComponent.hpp PsrthymeTemplateSection.hpp \
 		   SparseList.hpp VonMisesComponent.hpp \
 		   PsrthymeResult.hpp PsrthymeProfile.hpp \
 		   PsrthymeTelescope.hpp PsrthymeArchive.hpp \
-		   PsrthymeMatrix.hpp debug.hpp
+		   PsrthymeMatrix.hpp debug.hpp 
 
 cfiles = 
 hfiles =
@@ -29,6 +30,7 @@ BUILT_SOURCES=$(hppfiles) psrthyme.h psrthyme/psrthyme.hpp
 clean-local:
 	rm -f $(BUILT_SOURCES)
 
+EXTRA_DIST=glob.cpp
 if HAVE_PGPLOT
 cppfiles += PsrthymePlotter.cpp
 hppfiles += PsrthymePlotter.hpp
@@ -54,7 +56,10 @@ psrthyme.h: makeheaders $(makeheaders_files)
 	$(top_builddir)/src/makeheaders -H $(makeheaders_files) > psrthyme.h
 psrthyme/psrthyme.hpp: makeheaders $(makeheaders_files)
 	mkdir -p psrthyme
-	$(top_builddir)/src/makeheaders -h $(makeheaders_files) > psrthyme/psrthyme.hpp
+	echo "#ifndef _PSRTHYME_HPP" > psrthyme/psrthyme.hpp
+	echo "#define _PSRTHYME_HPP" >> psrthyme/psrthyme.hpp
+	$(top_builddir)/src/makeheaders -h $(makeheaders_files) >> psrthyme/psrthyme.hpp
+	echo "#endif //_PSRTHYME_HPP" >> psrthyme/psrthyme.hpp
 
 headerfiles: makeheaders $(makeheaders_files)
 	$(top_builddir)/src/makeheaders $(makeheaders_files)
