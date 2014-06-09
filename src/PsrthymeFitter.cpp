@@ -54,7 +54,7 @@ class PsrthymeFitter {
 	  void addItteration(uint64_t res, bool cholesky, bool zoom){
 		 this->itterations.push_back(Itteration(res,cholesky,zoom));
 	  }
-	  PsrthymeResult::Ptr fitTo(PsrthymeObservation::Ptr obs);
+	  PsrthymeResult::Ptr fitTo(PsrthymeProfile::Ptr obs);
 };
 
 #endif
@@ -85,7 +85,7 @@ std::vector<double> getCovarianceFunction (const std::vector<double> &profile){
 
 
 
-PsrthymeResult::Ptr PsrthymeFitter::fitTo(PsrthymeObservation::Ptr obs){
+PsrthymeResult::Ptr PsrthymeFitter::fitTo(PsrthymeProfile::Ptr obs){
    std::list<Itteration> ittrs(this->itterations);
    const uint64_t nbins = obs->getNbins();
    const uint64_t nfit = this->tmpl->size()+1;

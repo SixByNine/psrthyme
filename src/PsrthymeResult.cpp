@@ -15,7 +15,7 @@ class PsrthymeResult {
    public:
 	  SparseList::Ptr chisq_space;
 	  PsrthymeTemplate::Ptr tmpl;
-	  PsrthymeObservation::Ptr obsn;
+	  PsrthymeProfile::Ptr obsn;
 	  std::vector<double> amp_values;
 	  std::vector<double> amp_errors;
 	  PsrthymeMatrix::Ptr amp_cvm;

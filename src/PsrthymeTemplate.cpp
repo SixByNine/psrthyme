@@ -16,7 +16,7 @@
 #include <iostream>
 #include <vector>
 #include <boost/shared_ptr.hpp>
-class PsrthymeTemplate : public std::vector<PsrthymeProfile::Ptr>{
+class PsrthymeTemplate : public std::vector<PsrthymeTemplateSection::Ptr>{
    private:
 	  std::string name;
 	  PsrthymeTemplate(){}; // constructor
@@ -26,7 +26,7 @@ class PsrthymeTemplate : public std::vector<PsrthymeProfile::Ptr>{
 	  void read(std::istream &infile);
 	  PsrthymeMatrix::Ptr getDesignMatrix(uint64_t nbins, double offset_phase);
 	  void write(std::ostream &out);
-	  void addProfile(PsrthymeProfile::Ptr profile){
+	  void addProfile(PsrthymeTemplateSection::Ptr profile){
 		 this->push_back(profile);
 	  }
 };
@@ -82,7 +82,7 @@ void PsrthymeTemplate::read(std::istream &infile){
 	  }
 	  if (strings_equal(str,"KWPROFILE") || strings_equal(str,"PROFILE")){
 		 ss >> str;
-		 PsrthymeProfile::Ptr profile = PsrthymeProfile::Ptr(new PsrthymeProfile(str));
+		 PsrthymeTemplateSection::Ptr profile = PsrthymeTemplateSection::Ptr(new PsrthymeTemplateSection(str));
 		 this->addProfile(profile);
 		 continue;
 	  }

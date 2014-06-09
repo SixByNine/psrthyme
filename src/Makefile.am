@@ -15,16 +15,16 @@ libpsrthyme_la_CFLAGS = -fPIC @T2TOOLKIT_CFLAGS@
 libpsrthyme_la_LIBADD =@T2TOOLKIT_LIBS@ 
 
 cppfiles = PsrthymeTemplate.cpp PsrthymeFitter.cpp \
-		   PsrthymeComponent.cpp PsrthymeProfile.cpp \
+		   PsrthymeComponent.cpp PsrthymeTemplateSection.cpp \
 		   sparselist.cpp VonMisesComponent.cpp \
-		   PsrthymeResult.cpp PsrthymeObservation.cpp \
+		   PsrthymeResult.cpp PsrthymeProfile.cpp \
 		   PsrthymeMatrix.cpp debug.cpp
 
 hppfiles = PsrthymeMain.hpp \
 		   PsrthymeTemplate.hpp PsrthymeFitter.hpp \
-		   PsrthymeComponent.hpp PsrthymeProfile.hpp \
+		   PsrthymeComponent.hpp PsrthymeTemplateSection.hpp \
 		   sparselist.hpp VonMisesComponent.hpp \
-		   PsrthymeResult.hpp PsrthymeObservation.hpp \
+		   PsrthymeResult.hpp PsrthymeProfile.hpp \
 		   PsrthymeMatrix.hpp debug.hpp
 
 cfiles = 

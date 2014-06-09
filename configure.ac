@@ -63,6 +63,7 @@ fi
 SWIN_LIB_PGPLOT
 SWIN_LIB_FFTW
 SWIN_LIB_CFITSIO
+SWIN_LIB_PSRCHIVE
 
 #AX_BOOST_BASE([1.48],, [AC_MSG_ERROR([psrthyme needs Boost, but it was not found in your system])])
 
@@ -127,6 +128,11 @@ fi
 if test X$have_blas = Xyes; then
 	AC_MSG_NOTICE(Using BLAS library for matrix multiplication)
 fi
+
+if test X$have_psrchive != Xyes; then
+	AC_MSG_WARN(Psrchive not found - very limited functionality will result)
+fi
+
 
 echo ""
 echo "****"

@@ -14,7 +14,7 @@ int main(int argc, char** argv){
 
    tmpl->write(std::cout);
 
-   PsrthymeObservation::Ptr obs = PsrthymeObservation::Ptr(new PsrthymeObservation("../../kwikfit/examples/psr1.asc"));
+   PsrthymeProfile::Ptr obs = PsrthymeProfile::Ptr(new PsrthymeProfile("../../kwikfit/examples/psr1.asc"));
 		 obs->read();
 
    PsrthymeFitter::Ptr fitter = PsrthymeFitter::Ptr(new PsrthymeFitter());
