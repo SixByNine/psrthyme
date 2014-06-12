@@ -87,8 +87,8 @@ void PsrthymeTelescope::setup(){
 			tel->x = boost::lexical_cast<double>(elems[0]);
 			tel->y = boost::lexical_cast<double>(elems[1]);
 			tel->z = boost::lexical_cast<double>(elems[2]);
-			tel->id.push_back(elems[3]);
 			tel->id.push_back(elems[4]);
+			tel->id.push_back(elems[3]);
 			tel->name = elems[3];
 			BOOST_FOREACH (std::string id, tel->id){
 			   PsrthymeTelescope::id2scope[id]=tel;

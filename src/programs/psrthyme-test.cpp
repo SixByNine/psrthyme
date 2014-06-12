@@ -19,26 +19,28 @@ int main(int argc, char** argv){
    std::cout << archive->getStartTime() << std::endl;
    std::cout << archive->getTelescope() << std::endl;
 
-   PsrthymeTemplate::Ptr tmpl = PsrthymeTemplate::read("../../../kwikfit/examples/psr1.tmpl");
+//  PsrthymeTemplate::Ptr tmpl = PsrthymeTemplate::read("../../../kwikfit/examples/psr1.tmpl");
+   PsrthymeTemplate::Ptr tmpl = PsrthymeTemplate::read("/Users/mkeith/Projects/AGL/2032+4127/DATA/paas.tmpl");
 
    tmpl->write(std::cout);
 
 //   PsrthymeProfile::Ptr obs = PsrthymeProfile::readASCII("../../../kwikfit/examples/psr1.asc");
    PsrthymeProfile::Ptr obs = archive->getProfile(0,0,0);
 
-   BOOST_FOREACH (double v , obs->getProfile()){
-	  std::cout << v << std::endl;
-   }
-   exit(1);
 
 
    PsrthymeFitter::Ptr fitter = PsrthymeFitter::Ptr(new PsrthymeFitter());
    fitter->clear();
    fitter->addItteration(4,false,false);
+//   fitter->addItteration(4,false,false);
+//   fitter->addItteration(32,false,false);
    fitter->addItteration(4,true,false);
-   fitter->addItteration(8,true,true);
-   //fitter->addItteration(32,true,true);
-   //fitter->addItteration(128,true,true);
+   fitter->addItteration(4,true,false);
+   fitter->addItteration(4,true,false);
+   fitter->addItteration(4,true,false);
+//   fitter->addItteration(8,true,true);
+fitter->addItteration(32,true,true);
+//fitter->addItteration(128,true,true);
    fitter->setTemplate(tmpl);
 
    PsrthymeResult::Ptr result = fitter->fitTo(obs);
@@ -46,6 +48,9 @@ int main(int argc, char** argv){
    plt.plot(result);
    logmsg("PHASE = %lf",result->phase);
    logmsg("ERROR = %lf",result->error);
+
+   PsrthymeToA toa = result->getToA();
+   std::cout << toa.toString() << std::endl;
 
    return 0;
 }

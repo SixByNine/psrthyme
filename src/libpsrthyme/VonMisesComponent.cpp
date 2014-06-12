@@ -15,9 +15,20 @@ class VonMisesComponent : public PsrthymeComponent{
 	  double height;
 	  double centre;
 	  double concentration;
+	  double delta_phase;
    public:
-	  double getValue(double phase){
+	  double getValue(double phase) const {
 		 return this->height * exp((cos(2.0*M_PI*(phase - this->centre)) -1)*this->concentration);
+	  }
+
+	  double getValue(double p0, double p1) const{
+		 double ret = this->getValue(p0);
+		 uint_fast32_t n=1;
+		 for (double p = p0+this->delta_phase; p < p1; p++){
+			ret+=this->getValue(p);
+			n++;
+		 }	
+		 return ret/double(n);
 	  }
 	  void write(std::ostream &out){
 		 out << "\t\tVON_MISES " << this->centre << "\t" << this->concentration << "\t" << this->height << std::endl;
@@ -26,6 +37,7 @@ class VonMisesComponent : public PsrthymeComponent{
 		 this->height = height;
 		 this->centre = centre;
 		 this->concentration = concentration;
+		 this->delta_phase=1.0/4096;
 	  }
 	  typedef boost::shared_ptr<VonMisesComponent>  Ptr;
 };

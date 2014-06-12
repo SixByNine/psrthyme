@@ -51,7 +51,7 @@ void PsrthymePlotter::plot(PsrthymeResult::Ptr result){
    PgPlotData::Ptr profile = PgPlotData::blank();
    mainPlot->datasets.push_back(profile);
    profile->x = result->obsn->getPhase();
-   profile->y = result->obsn->getProfile();
+   profile->y = result->obsn->getNormalisedProfile();
 
    PgPlotData::Ptr tmpl = PgPlotData::blank();
    tmpl->x = result->obsn->getPhase();
@@ -118,10 +118,10 @@ void PsrthymePlotter::plot(PsrthymeResult::Ptr result){
 
    //colours and stuff
    profile->setPlotType(PgPlotData::HIST);
-   profile->lineColorIndex=PgPlot::BLUE;
+   profile->lineColorIndex=PgPlot::SKY;
 
    tmpl->setPlotType(PgPlotData::HIST);
-   tmpl->lineColorIndex=PgPlot::GREEN;
+   tmpl->lineColorIndex=PgPlot::SEA;
 
    resid->setPlotType(PgPlotData::HIST);
    resid->lineColorIndex=PgPlot::RED;
@@ -130,9 +130,9 @@ void PsrthymePlotter::plot(PsrthymeResult::Ptr result){
    chisq->lineColorIndex=PgPlot::RED;
 
    cov->setPlotType(PgPlotData::LINE);
-   cov->lineColorIndex=PgPlot::BLUE;
+   cov->lineColorIndex=PgPlot::SKY;
 
-   logmsg("%lg chisq_min",chisq_min);
+   logdbg("%lg chisq_min",chisq_min);
    midPlot->set_ylim(0,chisq_min*5);
 
    topPlot->title="XX";
@@ -143,15 +143,11 @@ void PsrthymePlotter::plot(PsrthymeResult::Ptr result){
    chizoom->pointColorIndex=PgPlot::ORANGE;
 
    chifit->setPlotType(PgPlotData::LINE);
-   chifit->lineColorIndex=PgPlot::GREEN;
+   chifit->lineColorIndex=PgPlot::SEA;
    chifit->lineType=4;
    topPlot->set_ylim(0,chisq_min*3);
 
-   logmsg("nplot %ld",result->chisq_space->size());
-/*sprintf(txt,"\\(2199) Chisq=%.3f dP=%.3g \\(2233) %.1g \\(2199)",
- *          result->chisq/(double)result->nfree,result->phase-ref_phase,
- *                   result->error);
- */
+   logdbg("nplot %ld",result->chisq_space->size());
    double best_chisq = result->chisq/double(result->nfree);
    boost::format format;
    format = boost::format("\\(2199) Chisq=%.3f dP=%.3g \\(2233) %.1g \\(2199)");
@@ -168,8 +164,8 @@ void PsrthymePlotter::plot(PsrthymeResult::Ptr result){
 		 txt->size=0.8;
    }
    midPlot->annotations.push_back(txt);
-   double mx = *std::max_element(result->obsn->getProfile().begin(), result->obsn->getProfile().end());
-   double mn = *std::min_element(result->obsn->getProfile().begin(), result->obsn->getProfile().end());
+   double mx = *std::max_element(result->obsn->getNormalisedProfile().begin(), result->obsn->getNormalisedProfile().end());
+   double mn = *std::min_element(result->obsn->getNormalisedProfile().begin(), result->obsn->getNormalisedProfile().end());
    double dy = (mx-mn)/20;
    for (uint64_t i =0; i < result->tmpl->size(); ++i){
 	  format = boost::format("\\(2199) %s %.2f \\(2233) %.2f \\(2199)");

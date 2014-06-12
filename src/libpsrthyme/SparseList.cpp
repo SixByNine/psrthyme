@@ -63,10 +63,10 @@ class SparseList {
 		 this->values.clear();
 	  }
 	  void toArray(double* index, double* values);
-	  double toArray(double* index, double* values, double centre);
+	  uint64_t toArray(double* index, double* values, double centre);
 
 	  void toArray(std::vector<double> &index, std::vector<double> &values);
-	  double toArray(std::vector<double> &index, std::vector<double> &values, double centre);
+	  uint64_t toArray(std::vector<double> &index, std::vector<double> &values, double centre);
 }
 
 #endif
@@ -117,13 +117,14 @@ void SparseList::toArray(std::vector<double> &index, std::vector<double> &values
    values.resize(this->size());
    return this->toArray(arr(index),arr(values));
 }
-double SparseList::toArray(std::vector<double> &index, std::vector<double> &values, double centre){
+uint64_t SparseList::toArray(std::vector<double> &index, std::vector<double> &values, double centre){
    index.resize(this->size());
    values.resize(this->size());
    return this->toArray(arr(index),arr(values),centre);
 }
-double SparseList::toArray(double* index, double* values, double centre){
+uint64_t SparseList::toArray(double* index, double* values, double centre){
    uint64_t idx=this->values.size()/2;
+   uint64_t idx0 = idx;
    uint64_t count=0;
    centre = this->closest(centre);
    logdbg("centre = %lf",centre);
@@ -139,7 +140,7 @@ double SparseList::toArray(double* index, double* values, double centre){
 		 idx=0;
 	  }
    }
-   return centre;
+   return idx0;
 }
 void SparseList::toArray(double* index, double* values){
    uint64_t idx=0;

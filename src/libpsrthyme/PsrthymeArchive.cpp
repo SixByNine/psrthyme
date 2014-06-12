@@ -41,8 +41,8 @@ class PsrthymeArchive {
 	  };
 	  PsrthymeProfile::Ptr getProfile(uint64_t isubint, uint64_t ichan, uint64_t ipol){
 		 PsrthymeProfile::Ptr ret = PsrthymeProfile::Ptr(
-			   new PsrthymeProfile(this->chive->get_Profile(isubint,ipol,ichan)
-				  ));
+			   new PsrthymeProfile(this->chive->get_Integration(isubint),ipol,ichan,this->getTelescope())
+				  );
 		 return ret;
 	  };
 

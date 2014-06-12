@@ -25,10 +25,12 @@ class PsrthymeFitter {
 		 uint64_t resolution;
 		 bool cholesky;
 		 bool zoom;
+		 bool matched_filter;
 		 Itteration(uint64_t resolution, bool cholesky, bool zoom){
 			this->resolution = resolution;
 			this->cholesky = cholesky;
 			this->zoom = zoom;
+			this->matched_filter=true;
 		 }
 	  };
 	  PsrthymeTemplate::Ptr tmpl;
@@ -50,9 +52,9 @@ class PsrthymeFitter {
 		 this->clear();
 		 this->itterations.push_front(Itteration(32,true,true));
 		 this->itterations.push_front(Itteration(8,true,true));
-		 this->itterations.push_front(Itteration(1,true,false));
-		 this->itterations.push_front(Itteration(1,true,false));
-		 this->itterations.push_front(Itteration(1,false,false));
+		 this->itterations.push_front(Itteration(2,true,false));
+		 this->itterations.push_front(Itteration(2,true,false));
+		 this->itterations.push_front(Itteration(2,false,false));
 	  }
 	  void clear(){
 		 this->itterations.clear();
@@ -74,8 +76,6 @@ std::vector<double> getCovarianceFunction (const std::vector<double> &profile){
 	  mean+=profile[i];
 	  cov[i]=0;
    }
-   LOGDBG << "nbins="<<nbins <<std::endl;
-   LOGDBG << "mean="<<mean <<std::endl;
    mean /= double(nbins);
    for(j = 0; j < nbins; j++){
 	  for(i = 0; i < nbins; i++){
@@ -92,12 +92,22 @@ std::vector<double> getCovarianceFunction (const std::vector<double> &profile){
 
 
 PsrthymeResult::Ptr PsrthymeFitter::fitTo(PsrthymeProfile::Ptr obs){
+   if (!obs){
+	  logerr("null pointer passed for observation. Perhaps the file could not be read?");
+	  exit(1);
+   }
+
+   if (!this->tmpl){
+	  logerr("null pointer passed for template. Perhaps the file could not be read");
+	  exit(1);
+   }
    std::list<Itteration> ittrs(this->itterations);
    const uint64_t nbins = obs->getNbins();
    const uint64_t nfit = this->tmpl->size()+1;
-   std::vector<double> residuals(obs->getProfile());
-   std::vector<double> best_profile(obs->getProfile());
-   LOGDBG << "nit = " << ittrs.size() << std::endl;
+   std::vector<double> residuals(obs->getNormalisedProfile());
+   std::vector<double> best_profile;
+   best_profile.resize(residuals.size());
+   best_profile[0]=1.0;
    PsrthymeMatrix::Ptr outCVM = PsrthymeMatrix::Ptr(new PsrthymeMatrix(nfit));
    boost::shared_ptr<double[]> outP(new double[nfit]);
    boost::shared_ptr<double[]> outErr(new double[nfit]);
@@ -118,12 +128,9 @@ PsrthymeResult::Ptr PsrthymeFitter::fitTo(PsrthymeProfile::Ptr obs){
    while(ittrs.size() > 0){
 	  Itteration itr = ittrs.front();
 	  ittrs.pop_front();
-	  LOGDBG << "nit = " << ittrs.size() << std::endl;
 	  const uint64_t nphase_steps = nbins * itr.resolution;
 	  const double prev_best_phase=chisq_space->min();
-	  LOGDBG << "prev_phase = " << prev_best_phase << std::endl;
 	  const double prev_best_chisq=chisq_space->get(prev_best_phase);
-	  LOGDBG << "prev_chisq = " << prev_best_chisq << std::endl;
 	  const double chisq_cut = prev_best_chisq*3.0;
 	  std::map<uint64_t, std::vector<double> > yvals;
 	  std::map<uint64_t, std::vector<double> > white_yvals;
@@ -131,10 +138,38 @@ PsrthymeResult::Ptr PsrthymeFitter::fitTo(PsrthymeProfile::Ptr obs){
 	  best_chisq = std::numeric_limits<double>::max();
 	  best_phase = 0;
 	  std::map<uint64_t, PsrthymeMatrix::Ptr > designMatricies;
-	  std::map<uint64_t, PsrthymeMatrix::Ptr > white_designMatricies;
 
-	  LOGDBG << "Alloc UINV " << std::endl;
-	  LOGDBG << "Get covar function" << std::endl;
+	  std::map<uint64_t, PsrthymeMatrix::Ptr > white_designMatricies;
+	  PsrthymeMatrix::Ptr mconv = PsrthymeMatrix::Ptr(new PsrthymeMatrix(nbins));
+
+	  //debug::plot(residuals,"raw residuals");
+	  if (itr.matched_filter){
+		 std::vector<double> matched_filter = best_profile;
+
+		 double alpha = 0;
+		 for (int64_t i=0; i < nbins; i++){
+			alpha+=(best_profile[i]*matched_filter[i]);
+		 }
+
+		 alpha = 1.0/sqrt(alpha);
+
+		 for (int64_t i=0; i < nbins; i++){
+			matched_filter[i] *= alpha;
+		 }
+
+		 for (int64_t i=0; i < nbins; i++){
+			for (int64_t j=0; j < nbins; j++){
+			   int64_t k = i-j;
+			   if (k<0)k+=nbins;
+			   (*mconv)[i][j] = matched_filter[k];
+			}
+		 }
+
+		 residuals = mconv*residuals;
+	  }
+
+	  //debug::plot(residuals,"filtered residuals");
+
 	  PsrthymeMatrix::Ptr covMatrix = PsrthymeMatrix::Ptr(new PsrthymeMatrix(nbins));
 	  cov = getCovarianceFunction(residuals);
 	  logdbg("var(data) = %lf",cov[0]);
@@ -149,7 +184,15 @@ PsrthymeResult::Ptr PsrthymeFitter::fitTo(PsrthymeProfile::Ptr obs){
 	  PsrthymeMatrix::Ptr uinv = PsrthymeMatrix::Ptr(new PsrthymeMatrix(nbins));
 	  cholesky_formUinv(uinv->c_arr(),covMatrix->c_arr(), nbins);
 
+	  //debug::plot(mconv*obs->getNormalisedProfile(),"pre fit filtered");
+	  //debug::plot(uinv*obs->getNormalisedProfile(),"pre fit white");
 
+	  if (itr.matched_filter){
+		 uinv = uinv*mconv;
+	  }
+
+
+	  //debug::plot(uinv*obs->getNormalisedProfile(),"pre fit white filtered");
 	  chisq_space->setResolution(nphase_steps);
 
 	  for(uint64_t iphase = 0; iphase < nphase_steps; iphase++){
@@ -161,15 +204,13 @@ PsrthymeResult::Ptr PsrthymeFitter::fitTo(PsrthymeProfile::Ptr obs){
 			uint64_t sbin = iphase-ibin*itr.resolution;
 			if ( yvals.count(ibin) == 0 ) {
 			   // need to generate the rotated profile
-			   //	   LOGDBG << "make rotprof for "<< ibin << std::endl;
-			   std::vector<double> rotated(obs->getProfile());
+			   std::vector<double> rotated(obs->getNormalisedProfile());
 			   std::rotate(rotated.begin(),rotated.begin()+ibin,rotated.end());
 			   white_yvals[ibin] = (*uinv)*rotated;
 			   yvals[ibin] = rotated;
 			}
 			if ( designMatricies.count(sbin) == 0 ) {
 			   // need to generate the DM for this sub-phase
-			   //	   LOGDBG << "make dm for "<< sbin << std::endl;
 			   PsrthymeMatrix::Ptr dm = this->tmpl->getDesignMatrix(nbins,double(sbin)/double(nphase_steps));
 			   PsrthymeMatrix::Ptr wdm = (*uinv)*dm;
 			   designMatricies[sbin] = dm;
@@ -200,8 +241,12 @@ PsrthymeResult::Ptr PsrthymeFitter::fitTo(PsrthymeProfile::Ptr obs){
 		 }
 	  }
 
-	  std::transform(obs->getProfile().begin(), obs->getProfile().end(),
+	  std::transform(obs->getNormalisedProfile().begin(), obs->getNormalisedProfile().end(),
 			best_profile.begin(), residuals.begin(), PsrthymeFitter::diff);
+
+	  double* t = (*(white_designMatricies[0])->T())[0];
+	  //debug::plot(std::vector<double>(t,t+nbins),"DM");
+	  //debug::plot(uinv*residuals, "Post-fit whitened residuals");
    }
 
    PsrthymeResult::Ptr result = PsrthymeResult::Ptr(new PsrthymeResult());
@@ -225,20 +270,19 @@ PsrthymeResult::Ptr PsrthymeFitter::fitTo(PsrthymeProfile::Ptr obs){
    {
 	  std::vector<double> x,y;
 	  double chisq_mult=2;
-	  result->chisqZoomY(best_chisq*chisq_mult, x,y);
+	  result->chisqZoomY(best_chisq*chisq_mult, x,y,true);
 	  while(x.size() < 3){
 		 chisq_mult*=1.1;
 		 x.clear();
 		 y.clear();
-		 result->chisqZoomY(best_chisq*chisq_mult, x,y);
+		 result->chisqZoomY(best_chisq*chisq_mult, x,y,true);
 	  }
+
 	  BOOST_FOREACH (double & i, x){
 		 i = PsrthymeResult::correctPhase(i-best_phase);
-		 logmsg("x %lf",i);
 	  }
 	  BOOST_FOREACH (double & i, y){
 		 i = (i-best_chisq);
-		 logmsg("y %lf",i);
 	  }
 
 	  std::vector<double> P;
@@ -257,7 +301,7 @@ PsrthymeResult::Ptr PsrthymeFitter::fitTo(PsrthymeProfile::Ptr obs){
 		 double fit_phase = -B/(2*A);
 		 double fit_min = -B*B/(4*A);
 	  }
-	  logmsg("fit_min = %lf fit_p = %lf A= %lf B=%lf",fit_min,fit_phase,A,B);
+	  logdbg("fit_min = %lf fit_p = %lf A= %lf B=%lf",fit_min,fit_phase,A,B);
 	  error_estimate = (-B + sqrt(B*B + 4.0 * A * best_chisq))/(2.0*A);
 	  error_estimate -= fit_phase;
 	  if(error_estimate > 0.5)error_estimate=0.5;
@@ -281,6 +325,7 @@ extern "C" void psrthyme_err_fit(double x, double *v,int m){
 	  v[0] = x*x;
 	  v[1] = x;
    } else {
-	  logmsg("m=%d???",m);
+	  logerr("m=%d???",m);
+	  exit(1);
    }
 }

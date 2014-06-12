@@ -12,7 +12,8 @@
 #include <iostream>
 class PsrthymeComponent {
    public:
-	  virtual double getValue(double phase)=0;
+	  virtual double getValue(double phase) const =0 ;
+	  virtual double getValue(double p0, double p1)const =0;
 	  virtual void write(std::ostream &out)=0;
 	  typedef boost::shared_ptr<PsrthymeComponent>  Ptr;
 };

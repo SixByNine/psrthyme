@@ -11,6 +11,7 @@
 #if INTERFACE
 #include <vector>
 #include <list>
+#include <mjd.h>
 #include <boost/shared_ptr.hpp>
 class PsrthymeResult {
    public:
@@ -35,11 +36,13 @@ class PsrthymeResult {
 	  std::vector<double> residual;
 	  void chisqZoom(double cntr, double hwidth, std::vector<double> &x, std::vector<double> &y);
 	  void chisqZoomY(double maxval, std::vector<double> &x, std::vector<double> &y);
+	  void chisqZoomY(double maxval, std::vector<double> &x, std::vector<double> &y, bool nogaps);
 	  void reduceChisq(std::vector<double> &c){
 		 for (uint64_t i=0; i < c.size(); i++){
 			c[i] /= double(this->nfree);
 		 }
 	  }
+	  PsrthymeToA getToA() const ;
 	  static double correctPhase(double p){
 		 while (p <= -0.5)p+=1.0;
 		 while (p  >  0.5)p-=1.0;
@@ -50,13 +53,30 @@ class PsrthymeResult {
 
 
 void PsrthymeResult::chisqZoomY(double maxval, std::vector<double> &x, std::vector<double> &y){
+   this->chisqZoomY(maxval,x,y,false);
+}
+void PsrthymeResult::chisqZoomY(double maxval, std::vector<double> &x, std::vector<double> &y, bool nogaps){
    std::vector<double> full_x;
    std::vector<double> full_y;
-   this->chisq_space->toArray(full_x,full_y,this->phase);
-   for (uint64_t i = 0; i < full_x.size(); i++){
-	  if ( full_y[i] < maxval){
-		 x.push_back(full_x[i]);
-		 y.push_back(full_y[i]);
+   uint64_t ctr = this->chisq_space->toArray(full_x,full_y,this->phase);
+
+   if(nogaps){
+	  uint64_t idx=ctr;
+	  while(idx > 0 && full_y[idx] < maxval){
+		 idx--;
+	  }
+	  idx++;
+	  while (full_y[idx] < maxval){
+		 x.push_back(full_x[idx]);
+		 y.push_back(full_y[idx]);
+		 idx++;
+	  }
+   } else {
+	  for (uint64_t i = 0; i < full_x.size(); i++){
+		 if ( full_y[i] < maxval){
+			x.push_back(full_x[i]);
+			y.push_back(full_y[i]);
+		 }
 	  }
    }
 }
@@ -72,3 +92,28 @@ void PsrthymeResult::chisqZoom(double cntr, double hwidth, std::vector<double> &
 	  }
    }
 }
+
+
+/*
+ * double period = subint->get_folding_period();
+ *
+ *   // epoch of the integration (rise time of bin 0 in each profile)
+ *     MJD epoch = subint->get_epoch ();
+ *
+ *       // arrival time 
+ *         toa.set_arrival (epoch + shift.get_value() * period);
+ *
+ *           // arrival time error in microseconds
+ *             toa.set_error (shift.get_error() * period * 1e6);
+ */
+PsrthymeToA PsrthymeResult::getToA() const{
+   double period = this->obsn->getPeriod();
+   return PsrthymeToA(
+		 this->obsn->getEpoch() + this->phase*period,
+		 this->error*period,
+		 this->obsn->getFreq(),
+		 this->obsn->getTelescope()
+		 );
+}
+
+

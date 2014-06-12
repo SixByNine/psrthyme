@@ -66,18 +66,15 @@ void PsrthymeTemplate::read(std::istream &infile){
 	  boost::trim(line);
 
 
-	  LOGDBG << "LINE: " << line<< std::endl;
 	  if (line[0]=='#' || line[0]=='\0')continue;
 
 	  std::stringstream ss(line);
 
 	  ss >> str; // read the first keyword
 
-	  LOGDBG << "CMD: " << str << std::endl;
 
 	  if (strings_equal(str,"KWTEMPLATE") || strings_equal(str,"TEMPLATE")){
 		 ss >> this->name;
-		 LOGDBG << "NAME: " << this->name << std::endl;
 		 continue;
 	  }
 	  if (strings_equal(str,"KWPROFILE") || strings_equal(str,"PROFILE")){
@@ -115,12 +112,13 @@ void PsrthymeTemplate::write(std::ostream &out){
 
 PsrthymeMatrix::Ptr PsrthymeTemplate::getDesignMatrix(uint64_t nbins,double offset_phase){
    PsrthymeMatrix::Ptr dm = PsrthymeMatrix::Ptr(new PsrthymeMatrix(nbins,this->size()+1));
+   double dp = 0.5/double(nbins);
    for (uint64_t ibin=0; ibin < nbins; ibin++){
 	  // We reference the leading edge of the bin as phase 0
 	  // so add half a bin to get to centre of a bin
 	  double phase = PsrthymeResult::correctPhase((double(ibin)+0.5)/double(nbins) - offset_phase);
 	  for (uint64_t iProf=0; iProf < this->size(); iProf++){
-		 (*dm)[ibin][iProf] = this->at(iProf)->getValue(phase);
+		 (*dm)[ibin][iProf] = this->at(iProf)->getValue(phase-dp,phase+dp);
 	  }
 	  (*dm)[ibin][this->size()]=1;
    }

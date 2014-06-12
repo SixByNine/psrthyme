@@ -2,7 +2,7 @@ lib_LTLIBRARIES=libpsrthyme.la
 nobase_include_HEADERS=psrthyme.h psrthyme/psrthyme.hpp
 
 
-AM_CPPFLAGS=-I$(top_srcdir)/src/boost/
+AM_CPPFLAGS=-I$(top_srcdir)/src/boost/ -DLOG_OUTDIR=stderr
 
 libpsrthyme_la_CPPFLAGS = $(AM_CPPFLAGS) -fPIC @T2TOOLKIT_CFLAGS@ @PSRCHIVE_CFLAGS@
 libpsrthyme_la_LIBADD =@T2TOOLKIT_LIBS@ @PSRCHIVE_LIBS@
@@ -13,6 +13,7 @@ cppfiles = Psrthyme.cpp \
 		   SparseList.cpp VonMisesComponent.cpp \
 		   PsrthymeResult.cpp PsrthymeProfile.cpp \
 		   PsrthymeTelescope.cpp PsrthymeArchive.cpp \
+		   PsrthymeToA.cpp \
 		   PsrthymeMatrix.cpp debug.cpp 
 
 hppfiles = Psrthyme.hpp \
@@ -21,12 +22,13 @@ hppfiles = Psrthyme.hpp \
 		   SparseList.hpp VonMisesComponent.hpp \
 		   PsrthymeResult.hpp PsrthymeProfile.hpp \
 		   PsrthymeTelescope.hpp PsrthymeArchive.hpp \
+		   PsrthymeToA.hpp \
 		   PsrthymeMatrix.hpp debug.hpp 
 
 cfiles = 
 hfiles =
 makeheaders_files=$(cppfiles) $(cfiles) $(top_srcdir)/src/mjk_utils/util.h.in
-BUILT_SOURCES=$(hppfiles) psrthyme.h psrthyme/psrthyme.hpp
+BUILT_SOURCES=$(hppfiles) psrthyme.h psrthyme/psrthyme.hpp madeheaders
 clean-local:
 	rm -f $(BUILT_SOURCES)
 
@@ -47,23 +49,23 @@ endif
 if HAVE_BLAS
 libpsrthyme_la_LIBADD+=@BLAS_LIBS@
 endif
-.PHONY: makeheaders
 
-makeheaders:
-	make -C .. makeheaders
 
-psrthyme.h: makeheaders $(makeheaders_files)
+psrthyme.h: madeheaders $(makeheaders_files)
 	$(top_builddir)/src/makeheaders -H $(makeheaders_files) > psrthyme.h
-psrthyme/psrthyme.hpp: makeheaders $(makeheaders_files)
+psrthyme/psrthyme.hpp: madeheaders $(makeheaders_files)
 	mkdir -p psrthyme
 	echo "#ifndef _PSRTHYME_HPP" > psrthyme/psrthyme.hpp
 	echo "#define _PSRTHYME_HPP" >> psrthyme/psrthyme.hpp
 	$(top_builddir)/src/makeheaders -h $(makeheaders_files) >> psrthyme/psrthyme.hpp
 	echo "#endif //_PSRTHYME_HPP" >> psrthyme/psrthyme.hpp
 
-headerfiles: makeheaders $(makeheaders_files)
+madeheaders: $(makeheaders_files)
+	make -C .. makeheaders
 	$(top_builddir)/src/makeheaders $(makeheaders_files)
+	touch madeheaders
 
-$(hppfiles): headerfiles
-$(hfiles): headerfiles
+
+$(hppfiles): madeheaders 
+$(hfiles): madeheaders
 
