@@ -132,6 +132,8 @@ uint64_t SparseList::toArray(double* index, double* values, double centre){
 	  if(it == this->values.end()){
 		 it=this->values.begin();
 	  }
+	  assert(idx >= 0);
+	  assert(idx < this->values.size());
 	  index[idx] = it->first;
 	  values[idx] = it->second;
 	  idx++;

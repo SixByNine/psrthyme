@@ -11,15 +11,21 @@
 #if INTERFACE
 #include <Pulsar/Archive.h>
 #include <boost/shared_ptr.hpp>
+#include <string>
+#include <sstream>
 class PsrthymeArchive {
    public:
 	  typedef boost::shared_ptr<Pulsar::Archive> Chive;
 	  typedef boost::shared_ptr<PsrthymeArchive> Ptr;
    private:
 	  Chive chive;
+	  std::string name;
    public:
 	  Chive getChive(){
 		 return this->chive;
+	  }
+	  std::string getName(){
+		 return this->name;
 	  }
 	  MJD getStartTime(){
 		 return this->chive->start_time();
@@ -41,17 +47,29 @@ class PsrthymeArchive {
 	  };
 	  PsrthymeProfile::Ptr getProfile(uint64_t isubint, uint64_t ichan, uint64_t ipol){
 		 PsrthymeProfile::Ptr ret = PsrthymeProfile::Ptr(
-			   new PsrthymeProfile(this->chive->get_Integration(isubint),ipol,ichan,this->getTelescope())
+			   new PsrthymeProfile(this->chive->get_Integration(isubint),ipol,ichan,this->getTelescope(), this->getName(isubint,ichan,ipol))
 				  );
 		 return ret;
 	  };
 
+	  std::string getName(uint64_t isub, uint64_t ichan, uint64_t ipol);
+	  
 	  PsrthymeArchive(std::string fname);
 
 };
 #endif
 
 PsrthymeArchive::PsrthymeArchive(std::string fname){
+   this->name = fname;
    this->chive = PsrthymeArchive::Chive(Pulsar::Archive::load(fname));
 }
+
+std::string PsrthymeArchive::getName(uint64_t isub, uint64_t ichan, uint64_t ipol){
+		 std::stringstream s;
+		 s << this->name;
+		 if(this->getNsub() > 1) s << "$i" << isub;
+		 if(this->getNchans() > 1) s << "$c" << ichan;
+		 if(this->getNpol() > 1) s << "$p" << ipol;
+		 return s.str();
+	  }
 

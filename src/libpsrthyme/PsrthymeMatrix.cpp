@@ -100,7 +100,7 @@ const std::vector<double> PsrthymeMatrix::operator*(const std::vector<double> &v
 	  throw std::invalid_argument("Can't multiply these matricies");
    }
    std::vector<double> out;
-   out.resize(this->x,0.0);
+   out.resize(this->x);
    TKmultMatrixVec(this->matrix,(double*) &vec[0],this->x, this->y, &out[0]);
    return out;
 }

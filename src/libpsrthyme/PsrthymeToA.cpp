@@ -18,12 +18,12 @@ class PsrthymeToA {
    public:
 	  std::map<std::string,std::string> flags;
 	  typedef boost::shared_ptr<PsrthymeToA> Ptr;
-	  PsrthymeToA(const MJD &toa, double error_s,double freq, PsrthymeTelescope::Ptr telescope) {
+	  PsrthymeToA(const std::string &name, const MJD &toa, double error_s,double freq, PsrthymeTelescope::Ptr telescope) {
 		 this->toa = toa;
 		 this->error = error_s;
 		 this->freq = freq;
 		 this->telescope = telescope;
-		 this->name="t";
+		 this->name=name;
 	  };
 	  void setFlag(std::string flag, std::string value){
 		 this->flags[flag] = value;

@@ -62,11 +62,17 @@ void PsrthymeResult::chisqZoomY(double maxval, std::vector<double> &x, std::vect
 
    if(nogaps){
 	  uint64_t idx=ctr;
-	  while(idx > 0 && full_y[idx] < maxval){
+	  double prev=full_y[ctr];
+	  while(idx > 0 && full_y[idx] < maxval && (ctr-idx < 3 || full_y[idx] > prev)){
+		 prev=full_y[idx];
 		 idx--;
 	  }
 	  idx++;
-	  while (full_y[idx] < maxval){
+	  while (idx < full_y.size() && full_y[idx] < maxval){
+		 assert(idx < full_y.size());
+		 assert(idx >=0);
+		 if (idx > ctr && full_y[idx] < prev)break;
+		 prev=full_y[idx];
 		 x.push_back(full_x[idx]);
 		 y.push_back(full_y[idx]);
 		 idx++;
@@ -109,6 +115,7 @@ void PsrthymeResult::chisqZoom(double cntr, double hwidth, std::vector<double> &
 PsrthymeToA PsrthymeResult::getToA() const{
    double period = this->obsn->getPeriod();
    return PsrthymeToA(
+		 this->obsn->getName(),
 		 this->obsn->getEpoch() + this->phase*period,
 		 this->error*period,
 		 this->obsn->getFreq(),

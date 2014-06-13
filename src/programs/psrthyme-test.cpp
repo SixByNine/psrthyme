@@ -31,16 +31,16 @@ int main(int argc, char** argv){
 
    PsrthymeFitter::Ptr fitter = PsrthymeFitter::Ptr(new PsrthymeFitter());
    fitter->clear();
-   fitter->addItteration(4,false,false);
-//   fitter->addItteration(4,false,false);
-//   fitter->addItteration(32,false,false);
-   fitter->addItteration(4,true,false);
-   fitter->addItteration(4,true,false);
-   fitter->addItteration(4,true,false);
-   fitter->addItteration(4,true,false);
-//   fitter->addItteration(8,true,true);
-fitter->addItteration(32,true,true);
-//fitter->addItteration(128,true,true);
+   fitter->addIteration(4,false,false);
+//   fitter->addIteration(4,false,false);
+//   fitter->addIteration(32,false,false);
+   fitter->addIteration(4,true,false);
+   fitter->addIteration(4,true,false);
+   fitter->addIteration(4,true,false);
+   fitter->addIteration(4,true,false);
+//   fitter->addIteration(8,true,true);
+fitter->addIteration(32,true,true);
+//fitter->addIteration(128,true,true);
    fitter->setTemplate(tmpl);
 
    PsrthymeResult::Ptr result = fitter->fitTo(obs);

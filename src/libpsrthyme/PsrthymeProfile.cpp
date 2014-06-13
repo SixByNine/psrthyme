@@ -31,13 +31,17 @@ class PsrthymeProfile {
 	  std::vector<double> profile;
 	  std::vector<double> normprofile;
 	  std::vector<double> phase;
+	  std::string name;
 	  PsrthymeTelescope::Ptr telescope;
 	  PsrthymeProfile(){
 		 this->chive = Chive(0);
 	  };
    public:
-	  Chive getChive(){
+	  Chive getChive() const{
 		 return this->chive;
+	 }
+	  const std::string getName() const{
+		 return this->name;
 	  }
 	  const std::vector<double> &getProfile() const{
 		 return this->profile;
@@ -69,7 +73,7 @@ class PsrthymeProfile {
 	  }
 
 
-	  PsrthymeProfile(Chive chive,uint64_t ipol, uint64_t ichan, PsrthymeTelescope::Ptr telescope);
+	  PsrthymeProfile(Chive chive,uint64_t ipol, uint64_t ichan, PsrthymeTelescope::Ptr telescope,std::string name);
 
 	  static Ptr readASCII(std::string in);
 	  static Ptr readASCII(std::istream &in);
@@ -77,8 +81,9 @@ class PsrthymeProfile {
 };
 #endif
 
-PsrthymeProfile::PsrthymeProfile(Chive chive,uint64_t ipol, uint64_t ichan, PsrthymeTelescope::Ptr telescope){
+PsrthymeProfile::PsrthymeProfile(Chive chive,uint64_t ipol, uint64_t ichan, PsrthymeTelescope::Ptr telescope,std::string name){
    this->ichan=ichan;
+   this->name = name;
    this->ipol=ipol;
    this->chive = chive; 
    this->telescope = telescope;

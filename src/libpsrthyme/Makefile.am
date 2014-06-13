@@ -25,10 +25,10 @@ hppfiles = Psrthyme.hpp \
 		   PsrthymeToA.hpp \
 		   PsrthymeMatrix.hpp debug.hpp 
 
-cfiles = 
-hfiles =
+cfiles =  mjk_clock.c
+hfiles = mjk_clock.h
 makeheaders_files=$(cppfiles) $(cfiles) $(top_srcdir)/src/mjk_utils/util.h.in
-BUILT_SOURCES=$(hppfiles) psrthyme.h psrthyme/psrthyme.hpp madeheaders
+BUILT_SOURCES=$(hppfiles) $(hfiles) psrthyme.h psrthyme/psrthyme.hpp madeheaders
 clean-local:
 	rm -f $(BUILT_SOURCES)
 
