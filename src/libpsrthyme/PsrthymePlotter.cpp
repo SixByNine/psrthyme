@@ -167,9 +167,10 @@ void PsrthymePlotter::plot(PsrthymeResult::Ptr result){
    double mx = *std::max_element(result->obsn->getNormalisedProfile().begin(), result->obsn->getNormalisedProfile().end());
    double mn = *std::min_element(result->obsn->getNormalisedProfile().begin(), result->obsn->getNormalisedProfile().end());
    double dy = (mx-mn)/20;
+   double scale=1.0/result->amp_values[0];
    for (uint64_t i =0; i < result->tmpl->size(); ++i){
 	  format = boost::format("\\(2199) %s %.2f \\(2233) %.2f \\(2199)");
-	  format % result->tmpl->at(i)->getName() % result->amp_values[i] % result->amp_errors[i];
+	  format % result->tmpl->at(i)->getName() % (scale*result->amp_values[i]) % (scale*result->amp_errors[i]);
 	  if (result->phase > 0){
 		 txt = PgPlotText::Ptr(new PgPlotText(format.str(),-0.5, mx-(i+1)*dy));
 		 txt->just = 0.0;

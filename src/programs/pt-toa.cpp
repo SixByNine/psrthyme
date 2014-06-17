@@ -5,6 +5,7 @@
 #include <inttypes.h>
 #include <TKlog.h>
 #include <boost/foreach.hpp>
+#include <boost/format.hpp>
 
 #include <fstream>
 #include <iostream>
@@ -12,6 +13,9 @@
 #include "pt-toa.hpp"
 
 int main(int argc, char** argv){
+
+   std::stringstream cmdline;
+   for(uint64_t i=0; i < argc; i++)cmdline << argv[i] << " ";
 
    const char* std_filename = getS("--std","-s",argc,argv,"psr.tmpl");
    debugFlag = getB("--debug","", argc,argv,0);
@@ -41,6 +45,12 @@ int main(int argc, char** argv){
    logdbg("infiles...");
    getArgs(&argc, argv);
    logdbg("There are  %d files to process",argc-1);
+   *out << "FORMAT 1" << std::endl;
+   *out << "# Produced by psrthyme (M. Keith 2014, University of Manchester)" << std::endl;
+   std::string str = (boost::format("%.75s") % cmdline.str()).str();
+   *out << "# " << str; 
+   if (cmdline.str().size() > 75) *out << "...";
+   *out << std::endl;
 
    for (uint64_t iarg=1; iarg < argc; iarg++){
 
