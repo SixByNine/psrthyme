@@ -13,7 +13,7 @@ cppfiles = Psrthyme.cpp \
 		   SparseList.cpp VonMisesComponent.cpp \
 		   PsrthymeResult.cpp PsrthymeProfile.cpp \
 		   PsrthymeTelescope.cpp PsrthymeArchive.cpp \
-		   PsrthymeToA.cpp \
+		   PsrthymeToA.cpp ExpModGaussComponent.cpp \
 		   PsrthymeMatrix.cpp debug.cpp 
 
 hppfiles = Psrthyme.hpp \
@@ -22,7 +22,7 @@ hppfiles = Psrthyme.hpp \
 		   SparseList.hpp VonMisesComponent.hpp \
 		   PsrthymeResult.hpp PsrthymeProfile.hpp \
 		   PsrthymeTelescope.hpp PsrthymeArchive.hpp \
-		   PsrthymeToA.hpp \
+		   PsrthymeToA.hpp ExpModGaussComponent.hpp \
 		   PsrthymeMatrix.hpp debug.hpp 
 
 cfiles =  mjk_clock.c
