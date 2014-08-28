@@ -53,10 +53,10 @@ static double estimate_error(PsrthymeResult::Ptr result);
 	  }
 	  void useDefaults(){
 		 this->clear();
-		 this->iterations.push_front(Iteration(32,true,true));
-		 this->iterations.push_front(Iteration(8,true,true));
-		 this->iterations.push_front(Iteration(2,true,false));
-		 this->iterations.push_front(Iteration(2,true,false));
+	//	 this->iterations.push_front(Iteration(32,true,true));
+	//	 this->iterations.push_front(Iteration(8,true,true));
+	//	 this->iterations.push_front(Iteration(2,true,false));
+	//	 this->iterations.push_front(Iteration(2,true,false));
 		 this->iterations.push_front(Iteration(2,false,false));
 	  }
 	  void clear(){

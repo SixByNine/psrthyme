@@ -95,6 +95,16 @@ void PsrthymeTemplate::read(std::istream &infile){
 		 VonMisesComponent::Ptr component = VonMisesComponent::Ptr(new VonMisesComponent(height,centre,conc));
 		 this->back()->addComponent(component);
 	  }
+	  if (strings_equal(str,"EXGAUSS")){
+		 double mu,sigma,lambda,amp;
+		 ss >> mu;
+		 ss >> sigma;
+		 ss >> lambda;
+		 ss >> amp;
+		 ExpModGaussComponent::Ptr component = ExpModGaussComponent::Ptr(new ExpModGaussComponent(mu,sigma,lambda,amp));
+		 this->back()->addComponent(component);
+	  }
+
    }
 }
 

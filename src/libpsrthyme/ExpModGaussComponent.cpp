@@ -10,6 +10,7 @@
 
 #if INTERFACE
 #include <boost/shared_ptr.hpp>
+#include <TKlog.h>
 class ExpModGaussComponent : public PsrthymeComponent{
    private:
 	  double amp;
@@ -19,11 +20,19 @@ class ExpModGaussComponent : public PsrthymeComponent{
 	  double delta_phase;
    public:
 	  double getValue(double phase) const {
+		 double mean = this->mu + 1.0/this->lambda;
+		 double x = phase - this->mu;
+		 while (x < mean-0.5)x+=1.0;
+		 while (x > mean+0.5)x-=1.0;
 		 double l2 = this->lambda/2.0;
 		 double l = this->lambda;
-		 return this->amp * l2 * 
-			exp( l2 * (2.0 * this->mu + l * this->sigma * this->sigma - 2 * phase))
-			* (1.0 - erf(phase));
+		 double s = this->sigma;
+		 double ss= s*s;
+		 double y = (l*ss - x) / sqrt(2.0) / s;
+		 double z = l2 * (l*ss - 2.0*x);
+		 double ret = this->amp*l2*exp(z) * (1.0 - erf(y));
+		 logmsg("%lf %lf %lf %lf : %lg : %lg %lg : %lf %lf",phase,x,y,z,ret,exp(z),1-erf(y),s,l);
+		 return ret;
 	  }
 
 	  double getValue(double p0, double p1) const{
@@ -38,7 +47,7 @@ class ExpModGaussComponent : public PsrthymeComponent{
 	  void write(std::ostream &out){
 		 out << "\t\tEXGAUSS " << this->mu << "\t" << this->sigma << "\t" << this->lambda << "\t" << this->amp << std::endl;
 	  }
-	  ExpModGaussComponent(double amp, double mu, double sigma, double lambda){
+	  ExpModGaussComponent(double mu, double sigma, double lambda, double amp){
 		 this->amp =amp;
 		 this->mu = mu;
 		 this->sigma=sigma;
