@@ -6,7 +6,7 @@ noinst_PROGRAMS = c++pgplot_test
 AM_CPPFLAGS=-I$(top_srcdir)/src/boost/ -DLOG_OUTDIR=stderr
 
 libc__pgplot_la_CFLAGS = -fPIC @T2TOOLKIT_CFLAGS@ 
-libc__pgplot_la_LIBADD =@T2TOOLKIT_LIBS@ 
+libc__pgplot_la_LIBADD =@T2TOOLKIT_LIBS@ @PGPLOT_LIBS@
 
 cppfiles = PgPlot.cpp PgPlotPane.cpp PgPlotData.cpp PgPlotText.cpp
 
