@@ -19,7 +19,7 @@ clean-local:
 
 libc__pgplot_la_SOURCES = $(hfiles) $(hppfiles) $(cfiles) $(cppfiles)
 
-c__pgplot_test_SOURCES = c++pgplot_test.cpp c++pgplot.h
+c__pgplot_test_SOURCES = c++pgplot_test.cpp c++pgplot/pgplot.hpp
 c__pgplot_test_LDADD = @PGPLOT_LIBS@ libc++pgplot.la
 
 

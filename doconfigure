@@ -23,4 +23,4 @@ fi
 echo "CFLAGS='$CFLAGS'"
 echo "LDFLAGS='$LDFLAGS'"
 
-./configure --prefix=/usr/local
+./configure --prefix=/usr/pulsar

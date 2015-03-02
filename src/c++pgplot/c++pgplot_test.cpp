@@ -1,6 +1,6 @@
 
 
-#include "cxxpgplot.h"
+#include "c++pgplot/pgplot.hpp"
 
 int main(int argc, char** argv){
    PgPlot plt;
