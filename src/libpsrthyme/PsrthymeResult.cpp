@@ -12,7 +12,7 @@
 #if INTERFACE
 #include <vector>
 #include <list>
-#include <mjd.h>
+#include <MJD.h>
 #include <boost/shared_ptr.hpp>
 class PsrthymeResult {
    public:

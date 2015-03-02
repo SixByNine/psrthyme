@@ -5,7 +5,7 @@
 #include <boost/foreach.hpp>
 #include <sstream>
 #if INTERFACE
-#include <mjd.h>
+#include <MJD.h>
 #include <boost/shared_ptr.hpp>
 #include <boost/algorithm/string/trim.hpp>
 #include <string>
