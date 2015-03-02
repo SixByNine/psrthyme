@@ -2,7 +2,6 @@
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
-#include <inttypes.h>
 #include <cpgplot.h>
 #include <TKlog.h>
 
@@ -13,6 +12,7 @@
 #include <boost/multi_array.hpp>
 #include <boost/shared_ptr.hpp>
 #include <vector>
+#include <inttypes.h>
 #define grid_t boost::multi_array<PgPlotPane::Ptr, 2>
 class PgPlot {
    private:
