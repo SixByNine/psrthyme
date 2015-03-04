@@ -27,9 +27,11 @@ class LevMar {
 	  }
 
 	  virtual uint32_t getMaxIterations(){
-		 return 100;
+		 return 20;
 	  }
 	  PsrthymeMatrix doFit(std::vector<double> &params, const std::vector<double> &yvals);
+	  PsrthymeMatrix doFit(std::vector<double> &params, const std::vector<double> &yvals,
+			const std::vector<double> &ub, const std::vector<double> &lb);
 };
 
 #endif
@@ -42,21 +44,50 @@ extern "C" void lm_callback_jacf_d(double *p, double *j, int m, int n, void *ada
 PsrthymeMatrix LevMar::doFit(vector<double> &params, const vector<double> &yvals){
    PsrthymeMatrix covar(params.size(),params.size());
    vector<double> y(yvals.begin(),yvals.end());
+   int nit=0;
 
    if(this->hasJacobian()){
-	  dlevmar_der(lm_callback_func_d,lm_callback_jacf_d,
+	  nit=dlevmar_der(lm_callback_func_d,lm_callback_jacf_d,
 			&params[0], &y[0],
 			params.size(), y.size(),
 			this->getMaxIterations(),NULL,NULL,NULL,covar.c_arr()[0],(void*)this);
    } else {
-	  dlevmar_dif(lm_callback_func_d,
+	  nit=dlevmar_dif(lm_callback_func_d,
 			&params[0], &y[0],
 			params.size(), y.size(),
 			this->getMaxIterations(),NULL,NULL,NULL,covar.c_arr()[0],(void*)this);
 
    }
+   logmsg("nit=%d",nit);
    return covar;
 }
+
+PsrthymeMatrix LevMar::doFit(vector<double> &params, const vector<double> &yvals,
+	  const vector<double> &_ub, const vector<double> &_lb){
+   PsrthymeMatrix covar(params.size(),params.size());
+   vector<double> y(yvals.begin(),yvals.end());
+   vector<double> lb(_lb.begin(),_lb.end());
+   vector<double> ub(_ub.begin(),_ub.end());
+	int nit=0;
+   if(this->hasJacobian()){
+	  nit=dlevmar_bc_der(lm_callback_func_d,lm_callback_jacf_d,
+			arr(params), arr(y),
+			params.size(), y.size(),
+			arr(lb), arr(ub),NULL,
+			this->getMaxIterations(),NULL,NULL,NULL,covar.c_arr()[0],(void*)this);
+   } else {
+	  nit=dlevmar_bc_dif(lm_callback_func_d,
+			arr(params), arr(y),
+			params.size(), y.size(),
+			arr(lb),arr(ub),NULL,
+			this->getMaxIterations(),NULL,NULL,NULL,covar.c_arr()[0],(void*)this);
+
+   }
+
+   logmsg("nit=%d",nit);
+   return covar;
+}
+
 
 
 /**

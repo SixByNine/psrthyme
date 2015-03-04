@@ -4,17 +4,17 @@ mode="$1"
 
 if [[ "$mode" == "O" ]] ; then
 	# optimised
-	export CFLAGS="-O3 -g0 -march=native -mno-avx -pipe -fomit-frame-pointer"
+	export CFLAGS="$CFLAGS -O3 -g0 -march=native -mno-avx -pipe -fomit-frame-pointer"
 	export CXXFLAGS="$CFLAGS"
 elif [[ "$mode" == "D" ]] ; then
-	export CFLAGS="-O0 -g3"
+	export CFLAGS="$CFLAGS -O0 -g3"
 	export CXXFLAGS="$CFLAGS"
 elif [[ "$mode" == "P" ]] ; then
-	export CFLAGS="-pg"
+	export CFLAGS="$CFLAGS -pg"
 	export CXXFLAGS="$CFLAGS"
 	export LDFLAGS='-pg'
 else
-	export CFLAGS="-O2 -g"
+	export CFLAGS="$CFLAGS -O2 -g"
 	export CXXFLAGS="$CFLAGS"
 fi
 

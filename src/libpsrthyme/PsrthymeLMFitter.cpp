@@ -68,11 +68,18 @@ PsrthymeResult::Ptr PsrthymeLMFitter::fitTo(PsrthymeProfile::Ptr obs){
    // [1..tmpl->size()-1] = amplitudes
    // [tmpl->size()] = baseline
    vector<double> params(this->tmpl->size()+2,1);
-   params[0]=0;
+   params[0]=0.;
    double best_chisq=0;
    uint64_t nfit = params.size();
    std::vector<double> residuals(obs->getNormalisedProfile());
-   
+   vector<double> ub(params.size(),std::numeric_limits<double>::max());
+   vector<double> lb(params.size(),-std::numeric_limits<double>::max());
+
+   ub[0]=0.5;
+   lb[0]=-0.5;
+   for (uint32_t i=0; i < this->tmpl->size(); i++){
+	  lb[i+1]=0;
+   }
    
    SparseList::Ptr chisq_space = SparseList::Ptr(new SparseList(0,1,4));
    chisq_space->insert(0,1);
@@ -80,7 +87,7 @@ PsrthymeResult::Ptr PsrthymeLMFitter::fitTo(PsrthymeProfile::Ptr obs){
    chisq_space->insert(0.5,1.3);
    chisq_space->insert(0.75,1.1);
 
-   PsrthymeMatrix covar = LevMar::doFit(params,residuals);
+   PsrthymeMatrix covar = LevMar::doFit(params,residuals,ub,lb);
 
    std::vector<double> best_profile = this->evaluate(params);
 
