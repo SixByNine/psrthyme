@@ -5,7 +5,6 @@ if HAVE_PGPLOT
 SUBDIRS+=c++pgplot
 endif
 
-SUBDIRS+=liblevmar++
 
 SUBDIRS+=libpsrthyme
 

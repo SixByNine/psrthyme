@@ -98,8 +98,7 @@ AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_FILES([Makefile src/Makefile 
 				 src/c++pgplot/Makefile
 				 src/libpsrthyme/Makefile
-				 src/liblevmar++/Makefile
-				 src/liblevmar++/levmar/Makefile
+				 src/libpsrthyme/levmar/Makefile
 				 src/programs/Makefile])
 
 AC_OUTPUT

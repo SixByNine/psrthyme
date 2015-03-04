@@ -37,7 +37,7 @@ class PsrthymeFitter {
 	  PsrthymeTemplate::Ptr tmpl;
 	  std::list<Iteration> iterations;
 
-static double estimate_error(PsrthymeResult::Ptr result);
+	  static double estimate_error(PsrthymeResult::Ptr result);
    public:
 
 	  static double diff(double a, double b){
