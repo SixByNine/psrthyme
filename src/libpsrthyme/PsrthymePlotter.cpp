@@ -78,6 +78,7 @@ void PsrthymePlotter::plot(PsrthymeResult::Ptr result){
    midPlot->datasets.push_back(chisq);
 
    PgPlotData::Ptr cov = PgPlotData::blank();
+   if (result->data_cov.size() > 0){
    cov->x = result->obsn->getPhase();
    cov->y = result->data_cov;
    double cov_min = *std::min_element(cov->y.begin(),cov->y.end());
@@ -89,31 +90,35 @@ void PsrthymePlotter::plot(PsrthymeResult::Ptr result){
 
 
    midPlot->datasets.push_back(cov);
+   }
 
 
 
    // top plot, the zoomed chisq.
    PgPlotPane::Ptr topPlot = pgplot.getPane(0,0);
-   topPlot->ylab="Chisq";
-
    PgPlotData::Ptr chizoom = PgPlotData::blank();
-
-   result->chisqZoom(result->phase, result->error*5.0, chizoom->x,chizoom->y);
-
-   result->reduceChisq(chizoom->y);
-
-
-
    PgPlotData::Ptr chifit = PgPlotData::blank();
-
-   chifit->x = result->chisq_fit_x;
-   chifit->y = result->chisq_fit_y;
-   result->reduceChisq(chifit->y);
-
-   topPlot->datasets.push_back(chizoom);
-   topPlot->datasets.push_back(chifit);
+   if (result->chisq_fit_x.size() > 0){
+	  logmsg("Plot chisq zoom");
+	  topPlot->ylab="Chisq";
 
 
+	  result->chisqZoom(result->phase, result->error*5.0, chizoom->x,chizoom->y);
+
+	  result->reduceChisq(chizoom->y);
+
+
+
+
+	  chifit->x = result->chisq_fit_x;
+	  chifit->y = result->chisq_fit_y;
+	  result->reduceChisq(chifit->y);
+
+	  topPlot->datasets.push_back(chizoom);
+	  topPlot->datasets.push_back(chifit);
+
+
+   }
 
 
    //colours and stuff
@@ -157,11 +162,11 @@ void PsrthymePlotter::plot(PsrthymeResult::Ptr result){
    if (result->phase > 0){
 	  txt = PgPlotText::Ptr(new PgPlotText(format.str(),-0.5,best_chisq*2));
 	  txt->just = 0.0;
-		 txt->size=0.8;
+	  txt->size=0.8;
    } else {
 	  txt = PgPlotText::Ptr(new PgPlotText(format.str(),0.5,best_chisq*2));
 	  txt->just = 1.0;
-		 txt->size=0.8;
+	  txt->size=0.8;
    }
    midPlot->annotations.push_back(txt);
    double mx = *std::max_element(result->obsn->getNormalisedProfile().begin(), result->obsn->getNormalisedProfile().end());

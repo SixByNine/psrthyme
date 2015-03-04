@@ -16,7 +16,7 @@ cppfiles = Psrthyme.cpp \
 		   PsrthymeTelescope.cpp PsrthymeArchive.cpp \
 		   PsrthymeToA.cpp ExpModGaussComponent.cpp \
 		   PsrthymeMatrix.cpp debug.cpp PsrthymeLMFitter.cpp \
-		   LevMar.cpp
+		   LevMar.cpp PsrthymeGenericFitter.cpp
 
 hppfiles = Psrthyme.hpp \
 		   PsrthymeTemplate.hpp PsrthymeFitter.hpp \
@@ -26,7 +26,7 @@ hppfiles = Psrthyme.hpp \
 		   PsrthymeTelescope.hpp PsrthymeArchive.hpp \
 		   PsrthymeToA.hpp ExpModGaussComponent.hpp \
 		   PsrthymeMatrix.hpp debug.hpp PsrthymeLMFitter.hpp \
-		   LevMar.hpp
+		   LevMar.hpp PsrthymeGenericFitter.hpp
 
 cfiles =  mjk_clock.c
 hfiles = mjk_clock.h

@@ -6,6 +6,7 @@
 #include <TKlog.h>
 #include <boost/foreach.hpp>
 #include <boost/format.hpp>
+#include <boost/shared_ptr.hpp>
 
 #include <fstream>
 #include <iostream>
@@ -21,6 +22,7 @@ int main(int argc, char** argv){
    debugFlag = getB("--debug","", argc,argv,0);
    const char* grdev = getS("--dev","-D", argc,argv,"/xs");
    const char* outfile = getS("--out","-o", argc,argv,"");
+   bool nlf = getB("--lmfit","-l", argc,argv,0);
    bool plot = getB("--plot","-p", argc,argv,0);
    bool turns = getB("--turns","-R", argc,argv,0);
 
@@ -32,7 +34,13 @@ int main(int argc, char** argv){
    const PsrthymeTemplate::Ptr tmpl = PsrthymeTemplate::read(std_filename);
 
    logdbg("initialise fitter");
-   PsrthymeFitter::Ptr fitter = PsrthymeFitter::Ptr(new PsrthymeFitter());
+   PsrthymeGenericFitter::Ptr fitter;
+  
+   if (nlf){
+	  fitter = (PsrthymeGenericFitter::Ptr(new PsrthymeLMFitter()));
+   } else {
+	  fitter = (PsrthymeGenericFitter::Ptr(new PsrthymeFitter()));
+   }
    fitter->setTemplate(tmpl);
 
    std::ostream *out = &std::cout;

@@ -20,7 +20,7 @@
 #include <list>
 #include <boost/shared_ptr.hpp>
 
-class PsrthymeFitter {
+class PsrthymeFitter : public PsrthymeGenericFitter {
    private:
 	  struct Iteration{
 		 uint64_t resolution;
