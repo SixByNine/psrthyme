@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <TKlog.h>
 #include "mjk_cmd.h"
 
 #define STREQ(a,b) (strcmp(a,b)==0)
@@ -10,7 +11,7 @@ void getArgs(int *argc, char** argv){
    int n=1;
    for (i=1;i< *argc; i++){
 	  if(argv[i][0]<5){
-		 i+=argv[i][0];
+		 i+=argv[i][0]-1;
 		 continue;
 	  }
 	  argv[n]=argv[i];
@@ -24,7 +25,7 @@ const char* getS(const char *lo, const char* so, int argc, char** argv, const ch
    for (i=1; i < argc; i++){
 	  if (STREQ(argv[i],lo) || STREQ(argv[i],so)){
 		 ret = *(argv+i+1);
-		 argv[i][0]=1;
+		 argv[i][0]=2;
 		 return ret;
 	  }
    }
@@ -37,7 +38,7 @@ char getB(const char *lo, const char* so, int argc, char** argv, char val){
    for (i=1; i < argc; i++){
 	  if (STREQ(argv[i],lo) || STREQ(argv[i],so)){
 		 ret = !val;
-		 argv[i][0]=0;
+		 argv[i][0]=1;
 		 break;
 	  }
    }

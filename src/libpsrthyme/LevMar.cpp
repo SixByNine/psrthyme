@@ -12,25 +12,37 @@
 #if EXPORT_INTERFACE
 #include <boost/shared_ptr.hpp>
 #include <vector>
+#define LM_INFO_SZ 10
+#define LM_INFO_CHISQ 1
 
 class LevMar {
    private:
+	  uint32_t niterations;
+   protected:
+	  double fit_info[LM_INFO_SZ];
    public:
+	  LevMar() {
+		 this->niterations=10;
+	  }
 
 	  virtual bool hasJacobian(){
 		 return false;
 	  }
-	  virtual std::vector<double> evaluate(std::vector<double> p) = 0;
-	  virtual std::vector<double> jacobian(std::vector<double> p){
+	  virtual std::vector<double> evaluate(const std::vector<double> &p) = 0;
+	  virtual std::vector<double> jacobian(const std::vector<double> &p){
 		 std::vector<double> ret(0);
 		 return ret;
 	  }
 
-	  virtual uint32_t getMaxIterations(){
-		 return 20;
+	  const uint32_t getMaxIterations(){
+		 return this->niterations;
 	  }
-	  PsrthymeMatrix doFit(std::vector<double> &params, const std::vector<double> &yvals);
-	  PsrthymeMatrix doFit(std::vector<double> &params, const std::vector<double> &yvals,
+	  void setMaxIterations(uint32_t niterations){
+		 this->niterations = niterations;
+	  }
+
+	  const PsrthymeMatrix doFit(std::vector<double> &params, const std::vector<double> &yvals);
+	  const PsrthymeMatrix doFit(std::vector<double> &params, const std::vector<double> &yvals,
 			const std::vector<double> &ub, const std::vector<double> &lb);
 };
 
@@ -41,7 +53,7 @@ using std::vector;
 extern "C" void lm_callback_func_d(double *p, double *hx, int m, int n, void *adata);
 extern "C" void lm_callback_jacf_d(double *p, double *j, int m, int n, void *adata);
 
-PsrthymeMatrix LevMar::doFit(vector<double> &params, const vector<double> &yvals){
+const PsrthymeMatrix LevMar::doFit(vector<double> &params, const vector<double> &yvals){
    PsrthymeMatrix covar(params.size(),params.size());
    vector<double> y(yvals.begin(),yvals.end());
    int nit=0;
@@ -50,19 +62,19 @@ PsrthymeMatrix LevMar::doFit(vector<double> &params, const vector<double> &yvals
 	  nit=dlevmar_der(lm_callback_func_d,lm_callback_jacf_d,
 			&params[0], &y[0],
 			params.size(), y.size(),
-			this->getMaxIterations(),NULL,NULL,NULL,covar.c_arr()[0],(void*)this);
+			this->getMaxIterations(),NULL,this->fit_info,NULL,covar.c_arr()[0],(void*)this);
    } else {
 	  nit=dlevmar_dif(lm_callback_func_d,
 			&params[0], &y[0],
 			params.size(), y.size(),
-			this->getMaxIterations(),NULL,NULL,NULL,covar.c_arr()[0],(void*)this);
+			this->getMaxIterations(),NULL,this->fit_info,NULL,covar.c_arr()[0],(void*)this);
 
    }
    logmsg("nit=%d",nit);
    return covar;
 }
 
-PsrthymeMatrix LevMar::doFit(vector<double> &params, const vector<double> &yvals,
+const PsrthymeMatrix LevMar::doFit(vector<double> &params, const vector<double> &yvals,
 	  const vector<double> &_ub, const vector<double> &_lb){
    PsrthymeMatrix covar(params.size(),params.size());
    vector<double> y(yvals.begin(),yvals.end());
@@ -74,13 +86,13 @@ PsrthymeMatrix LevMar::doFit(vector<double> &params, const vector<double> &yvals
 			arr(params), arr(y),
 			params.size(), y.size(),
 			arr(lb), arr(ub),NULL,
-			this->getMaxIterations(),NULL,NULL,NULL,covar.c_arr()[0],(void*)this);
+			this->getMaxIterations(),NULL,this->fit_info,NULL,covar.c_arr()[0],(void*)this);
    } else {
 	  nit=dlevmar_bc_dif(lm_callback_func_d,
 			arr(params), arr(y),
 			params.size(), y.size(),
 			arr(lb),arr(ub),NULL,
-			this->getMaxIterations(),NULL,NULL,NULL,covar.c_arr()[0],(void*)this);
+			this->getMaxIterations(),NULL,this->fit_info,NULL,covar.c_arr()[0],(void*)this);
 
    }
 

@@ -1,0 +1,34 @@
+
+ ** pt-toa ** -- PsrThyme ToA estimation.
+(c) 2015 Michael Keith, University of Manchester
+
+
+Matches an analytic template to observations. Reads any psrchive compatible
+profiles and outputs tempo2 format .tim file.
+
+Usage: 
+pt-toa -s <standard.tmpl> -o <output.tim> [options] <observations.FTp> ...
+
+where
+	- <standard.tmpl> is a psrthyme compatible analytic template file.
+	- <output.tim> is the file that will be written (overwrites file)
+	- <observations.FTp> is one or more files containing profiles.
+
+Options:
+
+	-s, --std       Specify template to use
+	-o, --out       Specify output .tim filename
+	-p, --plot      Plot profile, template and difference, and fit info
+	-D, --dev       Specfiy pgplot device for plotting (assumes -p)
+	-R, --turns     Print template offset in turns instead of ToAs
+	--debug         Enable verbose output
+
+	-l,	--lmfit     Use (experimental) non-linear fitter.
+Further options are avaliable with the non-linear fitter:
+		--scatter       Enable fitting for a scattering tail
+		--nosmear       Disable fitting for bandwidth smearing
+		--init_lm_itrs  Set the number of fit iterations for initial fit
+		--final_lm_itrs Set the number of fit iterations for final fit
+
+
+Good luck!

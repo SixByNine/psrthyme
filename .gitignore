@@ -10,3 +10,6 @@ Makefile
 /autoconf/
 /autom4te.cache/
 /stamp-h1
+.libs
+*.lo
+*.o

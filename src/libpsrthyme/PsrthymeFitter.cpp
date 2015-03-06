@@ -22,21 +22,6 @@
 
 class PsrthymeFitter : public PsrthymeGenericFitter {
    private:
-	  struct Iteration{
-		 uint64_t resolution;
-		 bool cholesky;
-		 bool zoom;
-		 bool matched_filter;
-		 Iteration(uint64_t resolution, bool cholesky, bool zoom){
-			this->resolution = resolution;
-			this->cholesky = cholesky;
-			this->zoom = zoom;
-			this->matched_filter=true;
-		 }
-	  };
-	  PsrthymeTemplate::Ptr tmpl;
-	  std::list<Iteration> iterations;
-
 	  static double estimate_error(PsrthymeResult::Ptr result);
    public:
 
@@ -137,28 +122,6 @@ double PsrthymeFitter::estimate_error(PsrthymeResult::Ptr result) {
 
 }
 
-
-std::vector<double> getCovarianceFunction (const std::vector<double> &profile){
-   uint64_t i,j;
-   const uint64_t nbins = profile.size();
-   std::vector<double> cov(profile);
-   double mean=0;
-   for(i = 0; i < nbins; i++){
-	  mean+=profile[i];
-	  cov[i]=0;
-   }
-   mean /= double(nbins);
-   for(j = 0; j < nbins; j++){
-	  for(i = 0; i < nbins; i++){
-		 cov[j] += (profile[i]-mean)*(profile[(i+j)%nbins]-mean);
-	  }
-   }
-   for(i = 0; i < nbins; i++){
-	  cov[i] /= double(nbins);
-   }
-
-   return cov;
-}
 
 
 
@@ -275,7 +238,7 @@ PsrthymeResult::Ptr PsrthymeFitter::fitTo(PsrthymeProfile::Ptr obs){
 	  //debug::plot(residuals,"filtered residuals");
 
 	  PsrthymeMatrix::Ptr covMatrix = PsrthymeMatrix::Ptr(new PsrthymeMatrix(nbins));
-	  cov = getCovarianceFunction(residuals);
+	  cov = this->getCovarianceFunction(residuals);
 	  logdbg("var(data) = %lf",cov[0]);
 	  if (itr.cholesky) {
 		 cov[0]*=(1+1e-4);

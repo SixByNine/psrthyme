@@ -19,20 +19,39 @@
 #if INTERFACE
 #include <list>
 #include <boost/shared_ptr.hpp>
+#include <numeric>
 
 class PsrthymeLMFitter : public LevMar, public PsrthymeGenericFitter {
    private:
-	  PsrthymeTemplate::Ptr tmpl;
+	  //PsrthymeTemplate::Ptr tmpl;
 	  PsrthymeProfile::Ptr obs;
+	  SincFitter sincFitter;
+	  PsrthymeMatrix::Ptr uinv;
    public:
 	  typedef boost::shared_ptr<PsrthymeLMFitter> Ptr;
+	  uint32_t final_nit;
+	  uint32_t initial_nit;
+	  bool enable_smear;
+	  bool enable_scatter;
 
 	  PsrthymeLMFitter() {
-	  } 
-
-	  void setTemplate(PsrthymeTemplate::Ptr tmpl){
-		 this->tmpl = tmpl;
+		 this->final_nit=25;
+		 this->initial_nit=4;
+		 this->enable_smear=true;
+		 this->enable_scatter=false;
+		 this->clear();
+		 this->iterations.push_front(Iteration(8,true,false));
+		 this->iterations.push_front(Iteration(8,false,false));
 	  }
+
+
+	  void clear(){
+		 this->iterations.clear();
+	  }
+	  void addIteration(uint64_t res, bool cholesky, bool zoom){
+		 this->iterations.push_back(Iteration(res,cholesky,zoom));
+	  }
+
 	  PsrthymeResult::Ptr fitTo(PsrthymeProfile::Ptr obs);
 
 	  // overide LevMar functions
@@ -40,14 +59,58 @@ class PsrthymeLMFitter : public LevMar, public PsrthymeGenericFitter {
 		 return false;
 	  }
 
-	  std::vector<double> evaluate(std::vector<double> p){
+	  std::vector<double> evaluate(const std::vector<double> &p){
+		 return this->evaluate(p,true);
+	  }
+	  std::vector<double> evaluate(const std::vector<double> &p, bool useCovar){
 		 std::vector<double> amps(p.begin()+1,p.begin()+this->tmpl->size()+2);
+		 uint32_t ipar=this->tmpl->size()+2;
 		 PsrthymeMatrix::Ptr designMatrix = this->tmpl->getDesignMatrix(this->obs->getNbins(), p[0]);
-		 std::vector<double> outprof = designMatrix*amps;
+		 std::vector<double> outprof = (designMatrix*amps);
+
+		 if (this->enable_smear){
+			const int32_t smw = floor(p[ipar]);
+			uint32_t nbins=this->obs->getNbins();
+			std::vector<double> filter(nbins,0);
+			filter[0]=1;
+			for (uint32_t i=0; i < smw; i++){
+			   filter[i] =1;
+			   filter[nbins-i]=1;	
+			}
+			filter[smw] = p[ipar]-smw;
+			filter[nbins-smw]=p[ipar]-smw;	
+			const double sum = std::accumulate(filter.begin(),filter.end(),(double)0);
+
+			for (uint32_t i=0; i < nbins; i++){
+			   filter[i]/=sum;
+			}
+			convolve(nbins,arr(outprof),arr(filter),arr(outprof));
+			ipar++;
+		 }
+		 if (this->enable_scatter){
+			const double scatw = p[ipar];
+			uint32_t nbins=this->obs->getNbins();
+			std::vector<double> filter(nbins,0);
+			filter[0]=1;
+			if(scatw > 0){
+			   for (uint32_t i=0; i < nbins; i++){
+				  filter[i] =exp(-(double)i/scatw);
+			   }
+			}
+			const double sum = std::accumulate(filter.begin(),filter.end(),(double)0);
+
+			for (uint32_t i=0; i < nbins; i++){
+			   filter[i]/=sum;
+			}
+			convolve(nbins,arr(outprof),arr(filter),arr(outprof));
+			ipar++;
+		 }
+
+		 if (useCovar) outprof = this->uinv * outprof;
 		 return outprof;
 	  }
 
-	  std::vector<double> jacobian(std::vector<double> p){
+	  std::vector<double> jacobian(const std::vector<double> &p){
 		 std::vector<double> ret(0);
 		 return ret;
 	  }
@@ -63,58 +126,143 @@ using std::vector;
 
 PsrthymeResult::Ptr PsrthymeLMFitter::fitTo(PsrthymeProfile::Ptr obs){
    this->obs = obs;
+   const uint64_t nbins = obs->getNbins();
    // params:
    // [0] = phase
    // [1..tmpl->size()-1] = amplitudes
    // [tmpl->size()] = baseline
+   // [++] = smearning width
+   // [++] = scattering width
    vector<double> params(this->tmpl->size()+2,1);
    params[0]=0.;
-   double best_chisq=0;
+   params[this->tmpl->size()+1]=0;
+   double best_chisq=std::numeric_limits<double>::max();
    uint64_t nfit = params.size();
    std::vector<double> residuals(obs->getNormalisedProfile());
+   std::vector<double> WHITE_yvals(obs->getNormalisedProfile());
    vector<double> ub(params.size(),std::numeric_limits<double>::max());
    vector<double> lb(params.size(),-std::numeric_limits<double>::max());
 
-   ub[0]=0.5;
-   lb[0]=-0.5;
    for (uint32_t i=0; i < this->tmpl->size(); i++){
 	  lb[i+1]=0;
    }
-   
-   SparseList::Ptr chisq_space = SparseList::Ptr(new SparseList(0,1,4));
-   chisq_space->insert(0,1);
-   chisq_space->insert(0.25,1.5);
-   chisq_space->insert(0.5,1.3);
-   chisq_space->insert(0.75,1.1);
+   if(this->enable_smear){
+	  params.push_back(3);
+	  lb.push_back(1);
+	  ub.push_back(nbins/4);
+   }
+   if(this->enable_scatter){
+	  params.push_back(5);
+	  lb.push_back(0);
+	  ub.push_back(nbins);
+   }
 
-   PsrthymeMatrix covar = LevMar::doFit(params,residuals,ub,lb);
-
-   std::vector<double> best_profile = this->evaluate(params);
-
-   double best_phase=params[0];
+   SparseList::Ptr chisq_space = SparseList::Ptr(new SparseList(0,1,nbins));
 
 
+   vector<double> best_params(params.begin(),params.end());
+
+   std::vector<double> best_profile(nbins,0);
+
+   std::list<Iteration> itrs(this->iterations);
+   vector<double> cov;
+   while(itrs.size())
+   {
+	  chisq_space->clear();
+	  best_chisq=std::numeric_limits<double>::max();
+	  logmsg("Processing '%s' iteration %ld/%ld",obs->getName().c_str(), 1+this->iterations.size() - itrs.size(),this->iterations.size());
+	  Iteration itr = itrs.front();
+	  itrs.pop_front();
+
+	  const vector<double> initial_params(best_params.begin(),best_params.end());
+	  // form residuals.
+	  std::transform(obs->getNormalisedProfile().begin(), obs->getNormalisedProfile().end(),
+			best_profile.begin(), residuals.begin(), PsrthymeFitter::diff);
+
+	  // get CovarFunction
+	  cov = getCovarianceFunction(residuals);
+	  for (uint32_t i =1; i < cov.size(); i++){
+		 cov[i]/=cov[0];
+	  }
+	  cov[0]=1;
+	  cov = sincFitter.fitTo(cov);
+
+	  PsrthymeMatrix::Ptr covMatrix = PsrthymeMatrix::Ptr(new PsrthymeMatrix(nbins));
+	  logmsg("covar... %lg %lg",cov[0],cov[1]);
+	  if (itr.cholesky) {
+		 cov[0]+=0.1;
+		 covMatrix->addCVF(cov);
+		 logmsg("chol");
+	  } else {
+		 covMatrix->addDiagonal(cov[0]);
+	  }
+
+	  this->uinv = PsrthymeMatrix::Ptr(new PsrthymeMatrix(nbins));
+	  cholesky_formUinv(uinv->c_arr(),covMatrix->c_arr(), nbins);
+	  WHITE_yvals=this->uinv * obs->getNormalisedProfile();
+
+
+	  LevMar::setMaxIterations(this->initial_nit);
+	  for (uint32_t ibin=0; ibin < nbins; ibin+=itr.resolution){
+		 params.clear();
+		 params.assign(initial_params.begin(),initial_params.end());
+
+		 double phase = PsrthymeResult::correctPhase(double(ibin)/double(nbins));
+		 params[0] = phase;
+
+		 LevMar::doFit(params,WHITE_yvals,ub,lb);
+		 const double chisq = LevMar::fit_info[LM_INFO_CHISQ];
+		 logmsg("Chisq?? = %lg",chisq);
+		 phase = PsrthymeResult::correctPhase(params[0]);
+		 chisq_space->insert(phase,chisq);
+		 if (chisq < best_chisq){
+			best_profile = this->evaluate(params,false);
+			best_chisq=chisq;
+			best_params.swap(params);
+		 }
+	  }
+
+	  // do the final fit.
+	  LevMar::setMaxIterations(this->final_nit);
+	  PsrthymeMatrix covar = LevMar::doFit(best_params,WHITE_yvals,ub,lb);
+   }
+
+
+   //LevMar::setMaxIterations(this->final_nit);
+   PsrthymeMatrix covar = LevMar::doFit(best_params,WHITE_yvals,ub,lb);
+   best_chisq=LevMar::fit_info[LM_INFO_CHISQ];
+   double best_phase= PsrthymeResult::correctPhase(best_params[0]);
+   chisq_space->insert(best_phase,best_chisq);
+
+
+   for (uint32_t i = 0; i < best_params.size(); i++){
+	  logmsg("%lg",best_params[i]);
+   }
+   // get final profile, etc
+
+   best_profile = this->evaluate(best_params,false);
+
+   std::transform(obs->getNormalisedProfile().begin(), obs->getNormalisedProfile().end(),
+		 best_profile.begin(), residuals.begin(), PsrthymeFitter::diff);
 
    PsrthymeResult::Ptr result = PsrthymeResult::Ptr(new PsrthymeResult());
    result->phase=best_phase;
    result->chisq = best_chisq;
-   std::transform(obs->getNormalisedProfile().begin(), obs->getNormalisedProfile().end(),
-		 best_profile.begin(), residuals.begin(), PsrthymeFitter::diff);
-
    result->tmpl = this->tmpl;
    result->obsn = obs;
-   result->amp_values = std::vector<double>(params.begin()+1,params.begin()+1+this->tmpl->size());
+   result->amp_values = std::vector<double>(best_params.begin()+1,best_params.begin()+1+this->tmpl->size());
 
    for (uint32_t i=0; i < this->tmpl->size(); i++){
-   result->amp_errors.push_back(sqrt(covar[i+1][i+1]));
+	  result->amp_errors.push_back(sqrt(covar[i+1][i+1]));
    }
 
    result->chisq_space = chisq_space;
    //result->amp_cvm = bestCVM;
    result->residual = residuals;
+   result->data_cov = cov;
    result->error = sqrt(covar[0][0]);
    result->best_profile = best_profile;
-   result->nfree=obs->getNbins()-nfit-1;
+   result->nfree=1;//nbins-nfit-1;
    result->nfit=nfit;
    result->phase=best_phase;
    result->chisq = best_chisq;
@@ -122,7 +270,6 @@ PsrthymeResult::Ptr PsrthymeLMFitter::fitTo(PsrthymeProfile::Ptr obs){
    return result;
 
 }
-
 
 
 

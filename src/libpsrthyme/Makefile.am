@@ -5,8 +5,8 @@ SUBDIRS=levmar
 
 AM_CPPFLAGS=-I$(top_srcdir)/src/boost/ -DLOG_OUTDIR=stderr
 
-libpsrthyme_la_CPPFLAGS = $(AM_CPPFLAGS) -fPIC @T2TOOLKIT_CFLAGS@ @PSRCHIVE_CFLAGS@
-libpsrthyme_la_LIBADD =@T2TOOLKIT_LIBS@ @PSRCHIVE_LIBS@
+libpsrthyme_la_CPPFLAGS = $(AM_CPPFLAGS) -fPIC @T2TOOLKIT_CFLAGS@ @PSRCHIVE_CFLAGS@ @FFTW_CFLAGS@
+libpsrthyme_la_LIBADD =@T2TOOLKIT_LIBS@ @PSRCHIVE_LIBS@ @FFTW_LIBS@
 
 cppfiles = Psrthyme.cpp \
 		   PsrthymeTemplate.cpp PsrthymeFitter.cpp \
@@ -16,7 +16,8 @@ cppfiles = Psrthyme.cpp \
 		   PsrthymeTelescope.cpp PsrthymeArchive.cpp \
 		   PsrthymeToA.cpp ExpModGaussComponent.cpp \
 		   PsrthymeMatrix.cpp debug.cpp PsrthymeLMFitter.cpp \
-		   LevMar.cpp PsrthymeGenericFitter.cpp
+		   LevMar.cpp PsrthymeGenericFitter.cpp convolve.cpp \
+		   SincFitter.cpp
 
 hppfiles = Psrthyme.hpp \
 		   PsrthymeTemplate.hpp PsrthymeFitter.hpp \
@@ -26,7 +27,8 @@ hppfiles = Psrthyme.hpp \
 		   PsrthymeTelescope.hpp PsrthymeArchive.hpp \
 		   PsrthymeToA.hpp ExpModGaussComponent.hpp \
 		   PsrthymeMatrix.hpp debug.hpp PsrthymeLMFitter.hpp \
-		   LevMar.hpp PsrthymeGenericFitter.hpp
+		   LevMar.hpp PsrthymeGenericFitter.hpp convolve.hpp \
+		   SincFitter.hpp
 
 cfiles =  mjk_clock.c
 hfiles = mjk_clock.h
