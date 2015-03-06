@@ -104,7 +104,6 @@ int main(int argc, char** argv){
    }
    fftw_export_wisdom_to_filename("psrthyme.wis");
 
-   fftw_cleanup_threads();
 
    return 0;
 }
