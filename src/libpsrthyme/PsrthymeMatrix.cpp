@@ -2,7 +2,6 @@
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
-#include <inttypes.h>
 #include <TKmatrix.h>
 #include <stdexcept>
 #include <TKlog.h>
@@ -15,6 +14,7 @@
 #include <boost/shared_ptr.hpp>
 #include <vector>
 #include <sstream>
+#include <inttypes.h>
 class PsrthymeMatrix {
    private:
 	  uint64_t x;
