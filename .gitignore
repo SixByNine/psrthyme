@@ -13,3 +13,8 @@ Makefile
 .libs
 *.lo
 *.o
+*.la
+*.lo
+madeheaders
+/src/makeheaders
+/build

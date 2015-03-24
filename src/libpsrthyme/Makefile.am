@@ -5,7 +5,7 @@ SUBDIRS=levmar
 
 AM_CPPFLAGS=-I$(top_srcdir)/src/boost/ -DLOG_OUTDIR=stderr
 
-libpsrthyme_la_CPPFLAGS = $(AM_CPPFLAGS) -fPIC @T2TOOLKIT_CFLAGS@ @PSRCHIVE_CFLAGS@ @FFTW_CFLAGS@
+libpsrthyme_la_CPPFLAGS = -I$(top_builddir)/src/libpsrthyme $(AM_CPPFLAGS) -fPIC @T2TOOLKIT_CFLAGS@ @PSRCHIVE_CFLAGS@ @FFTW_CFLAGS@
 libpsrthyme_la_LIBADD =@T2TOOLKIT_LIBS@ @PSRCHIVE_LIBS@ @FFTW_LIBS@
 
 cppfiles = Psrthyme.cpp \
@@ -32,10 +32,27 @@ hppfiles = Psrthyme.hpp \
 
 cfiles =  mjk_clock.c
 hfiles = mjk_clock.h
-makeheaders_files=$(cppfiles) $(cfiles) $(top_srcdir)/src/mjk_utils/util.h.in
-BUILT_SOURCES=$(hppfiles) $(hfiles) psrthyme.h psrthyme/psrthyme.hpp madeheaders
+
+makeheaders_files= $(hppfiles:%.hpp=$(srcdir)/%.cpp) $(hfiles:%.h=$(srcdir)/%.c)
+makeheaders_cmd = $(join $(hppfiles:%.hpp=$(srcdir)/%.cpp\:) $(hfiles:%.h=$(srcdir)/%.c\:), $(hppfiles) $(hfiles))
+
+makeheaders_files+=$(top_srcdir)/src/mjk_utils/util.h.in
+makeheaders_cmd+=$(top_srcdir)/src/mjk_utils/util.h.in:
+
+BUILT_SOURCES=$(builddir)/madeheaders
+madeheaders: $(makeheaders_files)
+	make -C .. makeheaders
+	$(top_builddir)/src/makeheaders $(makeheaders_cmd)
+	touch madeheaders
+
+$(hfiles) $(hppfiles): | madeheaders
+
+created=$(hppfiles) $(hfiles) $(helpfiles) madeheaders
+
 clean-local:
-	rm -f $(BUILT_SOURCES)
+	rm -f $(created)
+	
+
 
 EXTRA_DIST=glob.cpp
 if HAVE_PGPLOT
@@ -67,12 +84,4 @@ psrthyme/psrthyme.hpp: madeheaders $(makeheaders_files)
 	$(top_builddir)/src/makeheaders -h $(makeheaders_files) >> psrthyme/psrthyme.hpp
 	echo "#endif //_PSRTHYME_HPP" >> psrthyme/psrthyme.hpp
 
-madeheaders: $(makeheaders_files)
-	make -C .. makeheaders
-	$(top_builddir)/src/makeheaders $(makeheaders_files)
-	touch madeheaders
-
-
-$(hppfiles): madeheaders 
-$(hfiles): madeheaders
 

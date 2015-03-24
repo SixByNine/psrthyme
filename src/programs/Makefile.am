@@ -9,25 +9,32 @@ helpfiles=help/pt-toa.help
 
 pt_toa_SOURCES=pt-toa.cpp mjk_cmd.c $(hppfiles) $(helpfiles)
 
-makeheaders_files= psrthyme-test.cpp pt-toa.cpp mjk_cmd.c
-BUILT_SOURCES=$(hppfiles) $(hfiles) madeheaders $(helpfiles)
-
-clean-local:
-	rm -f $(BUILT_SOURCES)
-
-AM_CPPFLAGS=-I$(top_srcdir)/src/libpsrthyme -I$(top_srcdir)/src/boost @FFTW_CFLAGS@
-
-LDADD=$(top_builddir)/src/libpsrthyme/libpsrthyme.la $(top_builddir)/src/c++pgplot/libc++pgplot.la @FFTW_LIBS@
-
+makeheaders_files= $(hppfiles:%.hpp=$(srcdir)/%.cpp) $(hfiles:%.h=$(srcdir)/%.c)
+makeheaders_cmd = $(join $(hppfiles:%.hpp=$(srcdir)/%.cpp\:) $(hfiles:%.h=$(srcdir)/%.c\:), $(hppfiles) $(hfiles))
 
 madeheaders: $(makeheaders_files)
 	make -C .. makeheaders
-	$(top_builddir)/src/makeheaders $(makeheaders_files)
+	$(top_builddir)/src/makeheaders $(makeheaders_cmd)
 	touch madeheaders
 
+$(hfiles) $(hppfiles): | madeheaders
 
-$(hppfiles): madeheaders 
-$(hfiles): madeheaders
+
+created=$(hppfiles) $(hfiles) $(helpfiles) madeheaders
+
+clean-local:
+	rm -f $(created)
+	rm -f $(helpfiles)
+
+BUILT_SOURCES=$(builddir)/madeheaders $(builddir)/$(helpfiles)
+	
+
+AM_CPPFLAGS=-I$(top_builddir)/src/libpsrthyme -I$(top_srcdir)/src/boost @FFTW_CFLAGS@
+
+LDADD=$(top_builddir)/src/libpsrthyme/libpsrthyme.la $(top_builddir)/src/c++pgplot/libc++pgplot.la @FFTW_LIBS@
 
 %.help: %.txt
-	xxd -i $< > $@
+	mkdir -p help
+	xxd -i $< | sed -e 's: [^ ]*\(help_.*_txt\): \1:' > $@
+
+

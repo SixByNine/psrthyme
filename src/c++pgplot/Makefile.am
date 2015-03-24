@@ -12,10 +12,24 @@ cppfiles = PgPlot.cpp PgPlotPane.cpp PgPlotData.cpp PgPlotText.cpp
 
 hppfiles = PgPlot.hpp PgPlotPane.hpp PgPlotData.hpp PgPlotText.hpp
 
-makeheaders_files=$(cppfiles) 
-BUILT_SOURCES=$(hppfiles) c++pgplot/pgplot.hpp madeheaders
+BUILT_SOURCES=$(builddir)/madeheaders
+
+makeheaders_files= $(hppfiles:%.hpp=$(srcdir)/%.cpp) $(hfiles:%.h=$(srcdir)/%.c)
+makeheaders_cmd = $(join $(hppfiles:%.hpp=$(srcdir)/%.cpp\:) $(hfiles:%.h=$(srcdir)/%.c\:), $(hppfiles) $(hfiles))
+
+madeheaders: $(makeheaders_files)
+	make -C .. makeheaders
+	$(top_builddir)/src/makeheaders $(makeheaders_cmd)
+	touch madeheaders
+
+$(hfiles) $(hppfiles): | madeheaders
+
+
+created=$(hppfiles) $(hfiles) $(helpfiles) madeheaders
+
 clean-local:
-	rm -f $(BUILT_SOURCES)
+	rm -f $(created)
+
 
 libc__pgplot_la_SOURCES = $(hfiles) $(hppfiles) $(cfiles) $(cppfiles)
 
@@ -27,12 +41,4 @@ c++pgplot/pgplot.hpp: madeheaders $(makeheaders_files)
 	mkdir -p c++pgplot
 	$(top_builddir)/src/makeheaders -h $(makeheaders_files) > c++pgplot/pgplot.hpp
 
-madeheaders: $(makeheaders_files)
-	make -C .. makeheaders
-	$(top_builddir)/src/makeheaders $(makeheaders_files)
-	touch madeheaders
-
-
-$(hppfiles): madeheaders 
-$(hfiles): madeheaders
 

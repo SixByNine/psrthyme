@@ -22,5 +22,6 @@ fi
 
 echo "CFLAGS='$CFLAGS'"
 echo "LDFLAGS='$LDFLAGS'"
-
-./configure --prefix=/usr/pulsar
+mkdir build
+cd build
+../configure --prefix=/usr/pulsar
