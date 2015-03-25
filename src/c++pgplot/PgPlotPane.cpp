@@ -43,6 +43,8 @@ class PgPlotPane {
 	  std::vector<PgPlotData::Ptr> datasets;
 	  std::vector<PgPlotText::Ptr> annotations;
 	  void draw();
+	  char curs(float &x, float &y);
+	  void switchTo();
 	  void set_xlim(double x0, double x1){
 		 this->auto_xlim=false;
 		 this->xlim.first=x0;
@@ -76,7 +78,7 @@ PgPlotPane::PgPlotPane(double x0, double y0, double w, double h) {
    this->auto_ylim=true;
 }
 
-void PgPlotPane::draw(){
+void PgPlotPane::switchTo(){
    if (this->auto_xlim){
 	  double xmin =  std::numeric_limits<float>::max();
 	  double xmax = -std::numeric_limits<float>::max();
@@ -106,12 +108,17 @@ void PgPlotPane::draw(){
    logdbg("X '%s' %d",this->xlab.c_str(),this->xlab.length());
    if (this->xlab.length()==0) ymargin/=2.0;
    if (this->ylab.length()==0) xmargin/=2.0;
-   if (this->visible) {
-	  logdbg("Plotting x:%lg %lg y:%lg %lg",xlim.first,xlim.second,ylim.first,ylim.second);
-	  logdbg("VP x:%lg %lg y:%lg %lg",x0+xmargin,x0+width,y0+ymargin,y0+height);
-	  cpgsch(this->axsize);
 	  cpgsvp(x0+xmargin,x0+width,y0+ymargin,y0+height);
 	  cpgswin(xlim.first,xlim.second,ylim.first,ylim.second);
+
+	  logdbg("Plotting x:%lg %lg y:%lg %lg",xlim.first,xlim.second,ylim.first,ylim.second);
+	  logdbg("VP x:%lg %lg y:%lg %lg",x0+xmargin,x0+width,y0+ymargin,y0+height);
+}
+
+void PgPlotPane::draw(){
+   this->switchTo();
+   if (this->visible) {
+	  cpgsch(this->axsize);
 	  cpgbox("BC",0,0,"BC",0,0);
 	  if(draw_xtic)cpgbox("BTS",0,0,"",0,0);
 	  if(draw_ytic)cpgbox("",0,0,"BTS",0,0);
@@ -131,4 +138,11 @@ void PgPlotPane::draw(){
 		 txt->draw();
 	  }
    }
+}
+
+char PgPlotPane::curs(float &x, float &y){
+   this->switchTo();
+   char c;
+   cpgcurs(&x,&y,&c);
+   return c;
 }
