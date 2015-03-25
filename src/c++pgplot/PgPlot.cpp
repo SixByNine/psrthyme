@@ -40,6 +40,17 @@ class PgPlot {
 		 CIRCLE3=22, CIRCLE4=23, CIRCLE5=24, CIRCLE6=25, CIRCLE7=26, 
 		 CIRCLE8=27,LEFT=28, RIGHT=29, UP=30, DOWN=31};
 
+	  enum PgCursMode {
+		 CURS_NONE=0,
+		 CURS_LINE=1,
+		 CURS_RECT=2,
+		 CURS_HBAND=3,
+		 CURS_VBAND=4,
+		 CURS_HLINE=5,
+		 CURS_VLINE=6,
+		 CURS_XHAIR=7
+	  };
+
 	  typedef boost::shared_ptr<PgPlot> Ptr;
 	  PgPlot(); // constructor
 	  void createGrid(uint64_t nrow, uint64_t ncol);

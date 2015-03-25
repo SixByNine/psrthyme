@@ -43,8 +43,12 @@ class PgPlotPane {
 	  std::vector<PgPlotData::Ptr> datasets;
 	  std::vector<PgPlotText::Ptr> annotations;
 	  void draw();
-	  char curs(float &x, float &y);
-	  void switchTo();
+	  char curs(float &x, float &y){
+		 return this->curs(x,y,0,x,y);
+	  }
+
+	  char curs(float &x, float &y, uint_fast16_t mode, float xref, float yref);
+	  	  void switchTo();
 	  void set_xlim(double x0, double x1){
 		 this->auto_xlim=false;
 		 this->xlim.first=x0;
@@ -108,11 +112,11 @@ void PgPlotPane::switchTo(){
    logdbg("X '%s' %d",this->xlab.c_str(),this->xlab.length());
    if (this->xlab.length()==0) ymargin/=2.0;
    if (this->ylab.length()==0) xmargin/=2.0;
-	  cpgsvp(x0+xmargin,x0+width,y0+ymargin,y0+height);
-	  cpgswin(xlim.first,xlim.second,ylim.first,ylim.second);
+   cpgsvp(x0+xmargin,x0+width,y0+ymargin,y0+height);
+   cpgswin(xlim.first,xlim.second,ylim.first,ylim.second);
 
-	  logdbg("Plotting x:%lg %lg y:%lg %lg",xlim.first,xlim.second,ylim.first,ylim.second);
-	  logdbg("VP x:%lg %lg y:%lg %lg",x0+xmargin,x0+width,y0+ymargin,y0+height);
+   logdbg("Plotting x:%lg %lg y:%lg %lg",xlim.first,xlim.second,ylim.first,ylim.second);
+   logdbg("VP x:%lg %lg y:%lg %lg",x0+xmargin,x0+width,y0+ymargin,y0+height);
 }
 
 void PgPlotPane::draw(){
@@ -140,9 +144,10 @@ void PgPlotPane::draw(){
    }
 }
 
-char PgPlotPane::curs(float &x, float &y){
-   this->switchTo();
-   char c;
-   cpgcurs(&x,&y,&c);
-   return c;
-}
+char PgPlotPane::curs(float &x, float &y, uint_fast16_t mode, float xref, float yref){
+		 this->switchTo();
+		 char c;
+		 cpgband(mode,0,xref,yref,&x,&y,&c);
+		 return c;
+	  }
+
