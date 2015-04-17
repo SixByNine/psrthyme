@@ -20,6 +20,7 @@
 #include <list>
 #include <boost/shared_ptr.hpp>
 #include <numeric>
+#include <cassert>
 
 class PsrthymeLMFitter : public LevMar, public PsrthymeGenericFitter {
    private:
@@ -40,8 +41,8 @@ class PsrthymeLMFitter : public LevMar, public PsrthymeGenericFitter {
 		 this->enable_smear=true;
 		 this->enable_scatter=false;
 		 this->clear();
-		 this->iterations.push_front(Iteration(8,true,false));
-		 this->iterations.push_front(Iteration(8,false,false));
+		 this->iterations.push_front(Iteration(32,true,false));
+		 this->iterations.push_front(Iteration(32,false,false));
 	  }
 
 
@@ -63,17 +64,20 @@ class PsrthymeLMFitter : public LevMar, public PsrthymeGenericFitter {
 		 return this->evaluate(p,true);
 	  }
 	  std::vector<double> evaluate(const std::vector<double> &p, bool useCovar){
+		 const uint32_t nbins=this->obs->getNbins();
 		 std::vector<double> amps(p.begin()+1,p.begin()+this->tmpl->size()+2);
 		 uint32_t ipar=this->tmpl->size()+2;
 		 PsrthymeMatrix::Ptr designMatrix = this->tmpl->getDesignMatrix(this->obs->getNbins(), p[0]);
 		 std::vector<double> outprof = (designMatrix*amps);
 
+		 assert(outprof.size() == nbins);
+
 		 if (this->enable_smear){
 			const int32_t smw = floor(p[ipar]);
-			uint32_t nbins=this->obs->getNbins();
+			assert(smw < nbins);
 			std::vector<double> filter(nbins,0);
 			filter[0]=1;
-			for (uint32_t i=0; i < smw; i++){
+			for (uint32_t i=1; i < smw; i++){
 			   filter[i] =1;
 			   filter[nbins-i]=1;	
 			}
@@ -84,12 +88,12 @@ class PsrthymeLMFitter : public LevMar, public PsrthymeGenericFitter {
 			for (uint32_t i=0; i < nbins; i++){
 			   filter[i]/=sum;
 			}
-			convolve(nbins,arr(outprof),arr(filter),arr(outprof));
+			assert(filter.size()==outprof.size());
+			//convolve(nbins,arr(outprof),arr(filter),arr(outprof));
 			ipar++;
 		 }
 		 if (this->enable_scatter){
 			const double scatw = p[ipar];
-			uint32_t nbins=this->obs->getNbins();
 			std::vector<double> filter(nbins,0);
 			filter[0]=1;
 			if(scatw > 0){
@@ -102,6 +106,7 @@ class PsrthymeLMFitter : public LevMar, public PsrthymeGenericFitter {
 			for (uint32_t i=0; i < nbins; i++){
 			   filter[i]/=sum;
 			}
+			assert(filter.size()==outprof.size());
 			convolve(nbins,arr(outprof),arr(filter),arr(outprof));
 			ipar++;
 		 }
@@ -212,7 +217,7 @@ PsrthymeResult::Ptr PsrthymeLMFitter::fitTo(PsrthymeProfile::Ptr obs){
 
 		 LevMar::doFit(params,WHITE_yvals,ub,lb);
 		 const double chisq = LevMar::fit_info[LM_INFO_CHISQ];
-		 logmsg("Chisq?? = %lg",chisq);
+		 logmsg("i= %d Chisq = %lg",ibin,chisq);
 		 phase = PsrthymeResult::correctPhase(params[0]);
 		 chisq_space->insert(phase,chisq);
 		 if (chisq < best_chisq){

@@ -1,13 +1,14 @@
 noinst_PROGRAMS=psrthyme-test
-bin_PROGRAMS=pt-toa
+bin_PROGRAMS=pt-toa pt-tmpl
 
 psrthyme_test_SOURCES=psrthyme-test.cpp mjk_cmd.c
 
-hppfiles=psrthyme-test.hpp pt-toa.hpp
+hppfiles=psrthyme-test.hpp pt-toa.hpp pt-tmpl.hpp
 hfiles=mjk_cmd.h
-helpfiles=help/pt-toa.help
+helpfiles=help/pt-toa.help help/pt-tmpl.help
 
 pt_toa_SOURCES=pt-toa.cpp mjk_cmd.c $(hppfiles) $(helpfiles)
+pt_tmpl_SOURCES=pt-tmpl.cpp mjk_cmd.c $(hppfiles) $(helpfiles)
 
 makeheaders_files= $(hppfiles:%.hpp=$(srcdir)/%.cpp) $(hfiles:%.h=$(srcdir)/%.c)
 makeheaders_cmd = $(join $(hppfiles:%.hpp=$(srcdir)/%.cpp\:) $(hfiles:%.h=$(srcdir)/%.c\:), $(hppfiles) $(hfiles))

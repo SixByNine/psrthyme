@@ -42,7 +42,7 @@ class PgPlotPane {
 	  std::string title;
 	  std::vector<PgPlotData::Ptr> datasets;
 	  std::vector<PgPlotText::Ptr> annotations;
-	  void draw();
+	  virtual void draw();
 	  char curs(float &x, float &y){
 		 return this->curs(x,y,0,x,y);
 	  }

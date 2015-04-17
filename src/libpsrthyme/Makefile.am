@@ -17,7 +17,7 @@ cppfiles = Psrthyme.cpp \
 		   PsrthymeToA.cpp ExpModGaussComponent.cpp \
 		   PsrthymeMatrix.cpp debug.cpp PsrthymeLMFitter.cpp \
 		   LevMar.cpp PsrthymeGenericFitter.cpp convolve.cpp \
-		   SincFitter.cpp
+		   SincFitter.cpp PsrthymeTemplateEditor.cpp
 
 hppfiles = Psrthyme.hpp \
 		   PsrthymeTemplate.hpp PsrthymeFitter.hpp \
@@ -28,7 +28,7 @@ hppfiles = Psrthyme.hpp \
 		   PsrthymeToA.hpp ExpModGaussComponent.hpp \
 		   PsrthymeMatrix.hpp debug.hpp PsrthymeLMFitter.hpp \
 		   LevMar.hpp PsrthymeGenericFitter.hpp convolve.hpp \
-		   SincFitter.hpp
+		   SincFitter.hpp PsrthymeTemplateEditor.hpp
 
 cfiles =  mjk_clock.c
 hfiles = mjk_clock.h

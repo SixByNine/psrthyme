@@ -1,0 +1,20 @@
+
+ ** pt-tmpl ** -- PsrThyme Template Generation
+(c) 2015 Michael Keith, University of Manchester
+
+Creates a PsrThyme template file.
+
+Usage: 
+pt-tmpl -s <standard.tmpl> -f <input.fits> [options] 
+
+where
+	- <standard.tmpl> is an optional psrthyme compatible analytic template file.
+	- <input.fits> is an optional profile to base template on
+
+Options:
+
+	-D, --dev       Specfiy pgplot device for plotting
+	--debug         Enable verbose output
+
+
+Good luck!
