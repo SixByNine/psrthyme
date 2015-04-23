@@ -87,6 +87,10 @@ int main(int argc, char** argv){
 			PsrthymeProfile::Ptr obs = archive->getProfile(isub,ichan,0);
 			logdbg("DOING THE FIT");
 			PsrthymeResult::Ptr result = fitter->fitTo(obs);
+            if (result->failed){
+                logdbg("FIT FAILED!");
+                continue;
+            }
 			logdbg("DONE FIT");
 			if (turns){
 			   *out << argv[iarg] << "\t" << result->phase << "\t" << result->error << std::endl; 
@@ -98,7 +102,6 @@ int main(int argc, char** argv){
 			   PsrthymePlotter plt(grdev);
 			   plt.plot(result);
 			}
-
 		 }
 	  }
    }

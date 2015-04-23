@@ -127,6 +127,8 @@ using std::vector;
 PsrthymeResult::Ptr PsrthymeLMFitter::fitTo(PsrthymeProfile::Ptr obs){
    this->obs = obs;
    const uint64_t nbins = obs->getNbins();
+
+   PsrthymeResult::Ptr result = PsrthymeResult::Ptr(new PsrthymeResult());
    // params:
    // [0] = phase
    // [1..tmpl->size()-1] = amplitudes
@@ -198,7 +200,10 @@ PsrthymeResult::Ptr PsrthymeLMFitter::fitTo(PsrthymeProfile::Ptr obs){
 	  }
 
 	  this->uinv = PsrthymeMatrix::Ptr(new PsrthymeMatrix(nbins));
-	  cholesky_formUinv(uinv->c_arr(),covMatrix->c_arr(), nbins);
+	  if(cholesky_formUinv(uinv->c_arr(),covMatrix->c_arr(), nbins)) {
+          result->failed=true;
+          return result;
+      }
 	  WHITE_yvals=this->uinv * obs->getNormalisedProfile();
 
 
@@ -245,7 +250,6 @@ PsrthymeResult::Ptr PsrthymeLMFitter::fitTo(PsrthymeProfile::Ptr obs){
    std::transform(obs->getNormalisedProfile().begin(), obs->getNormalisedProfile().end(),
 		 best_profile.begin(), residuals.begin(), PsrthymeFitter::diff);
 
-   PsrthymeResult::Ptr result = PsrthymeResult::Ptr(new PsrthymeResult());
    result->phase=best_phase;
    result->chisq = best_chisq;
    result->tmpl = this->tmpl;
