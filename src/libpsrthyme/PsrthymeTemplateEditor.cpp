@@ -20,60 +20,67 @@ class PsrthymeTemplateEditor {
     private: 
         std::string device;
         PsrthymeTemplate::Ptr the_template;
-        PsrthymeArchive::Ptr obsn;
+        PsrthymeProfile::Ptr obsn;
     public:
         PsrthymeTemplateEditor(std::string dev, PsrthymeTemplate::Ptr tmpl, const PsrthymeArchive::Ptr archive) 
             : device(dev),
             the_template(tmpl),
-            obsn(archive) {
+            obsn(archive->getProfile(0,0,0)) {
             }
         void run();
 }
 
 #endif
 
+using std::vector;
+
 void PsrthymeTemplateEditor::run(){
+    const uint64_t nbins = this->obsn->getNbins();
+    float x=0,y=0;
+    char key=0;
+
+    while (true) {
+
+        PsrthymeMatrix::Ptr dm = this->the_template->getDesignMatrix(nbins,0);
+        PgPlot pgplot;
+        pgplot.createGrid(1,1);
+
+        // Lower plot, it's the pulse profile
+        PgPlotPane::Ptr mainPlot = pgplot.getPane(0,0);
+        mainPlot->set_xlim(-0.5,0.5);
+
+        vector<double> b_vector(dm->rows(),1);
+        b_vector[dm->rows()-1]=0;
+        PgPlotData::Ptr profile = PgPlotData::blank();
+        mainPlot->datasets.push_back(profile);
+        profile->x = obsn->getPhase();
+        profile->y = obsn->getNormalisedProfile();
 
 
-    PsrThymeMatrix::Ptr dm = this->the_template->getDesignMatrix(nbins,0);
-    double chisq_min = result->chisq_space->get(result->chisq_space->min())/double(result->nfree);
-    PgPlot pgplot;
-    pgplot.createGrid(1,1);
+        PgPlotData::Ptr tmpl = PgPlotData::blank();
+        tmpl->x = obsn->getPhase();
+        tmpl->y = dm*b_vector;
+        mainPlot->datasets.push_back(tmpl);
 
-    // Lower plot, it's the pulse profile
-    PgPlotPane::Ptr mainPlot = pgplot.getPane(0,0);
-    mainPlot->set_xlim(-0.5,0.5);
+        PgPlotData::Ptr resid = PgPlotData::blank();
+        //  resid->x = obsn->getPhase();
+        //resid->y = residual;
+        //  mainPlot->datasets.push_back(resid);
+        mainPlot->xlab="Phase";
+        mainPlot->ylab="Amplitude";
 
-    vector<double> b_vector(1024,1);
-    b_vector[0]=0;
-    PgPlotData::Ptr profile = PgPlotData::blank();
-    mainPlot->datasets.push_back(profile);
-    profile->x = obsn->getPhase();
-    profile->y = obsn->getNormalisedProfile();
+        //colours and stuff
+        profile->setPlotType(PgPlotData::HIST);
+        profile->lineColorIndex=PgPlot::SKY;
 
+        tmpl->setPlotType(PgPlotData::HIST);
+        tmpl->lineColorIndex=PgPlot::SEA;
 
-    PgPlotData::Ptr tmpl = PgPlotData::blank();
-    tmpl->x = obsn->getPhase();
-    tmpl->y = dm*b_vector;
-    mainPlot->datasets.push_back(tmpl);
+        resid->setPlotType(PgPlotData::HIST);
+        resid->lineColorIndex=PgPlot::RED;
 
-    PgPlotData::Ptr resid = PgPlotData::blank();
-    resid->x = obsn->getPhase();
-    resid->y = residual;
-    mainPlot->datasets.push_back(resid);
-    mainPlot->xlab="Phase";
-    mainPlot->ylab="Amplitude";
-
-    //colours and stuff
-    profile->setPlotType(PgPlotData::HIST);
-    profile->lineColorIndex=PgPlot::SKY;
-
-    tmpl->setPlotType(PgPlotData::HIST);
-    tmpl->lineColorIndex=PgPlot::SEA;
-
-    resid->setPlotType(PgPlotData::HIST);
-    resid->lineColorIndex=PgPlot::RED;
-
-    pgplot.show(this->dev);
+        pgplot.show(this->device,true);
+        key=pgplot.curs(x,y);
+    }
 
 }

@@ -43,6 +43,7 @@ int main(int argc, char** argv){
 	  archive = PsrthymeArchive::Ptr( new PsrthymeArchive(filename));
    }
 
+   logmsg("Start template editor");
    PsrthymeTemplateEditor editor(grdev,tmpl,archive);
    editor.run();
 

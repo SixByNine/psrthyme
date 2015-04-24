@@ -47,6 +47,15 @@ class PsrthymeMatrix {
 		 return p;
 	  }
 
+      double rows() const{
+          return this->y;
+      }
+      double cols() const{
+          return this->x;
+      }
+
+
+
 	  const Ptr operator*(const Ptr m);
 	  const Ptr operator*(const PsrthymeMatrix &m);
 	  friend const Ptr operator*(const Ptr &m1, const Ptr &m2);

@@ -43,12 +43,7 @@ class PgPlotPane {
 	  std::vector<PgPlotData::Ptr> datasets;
 	  std::vector<PgPlotText::Ptr> annotations;
 	  virtual void draw();
-	  char curs(float &x, float &y){
-		 return this->curs(x,y,0,x,y);
-	  }
-
-	  char curs(float &x, float &y, uint_fast16_t mode, float xref, float yref);
-	  	  void switchTo();
+	  	  	  void switchTo();
 	  void set_xlim(double x0, double x1){
 		 this->auto_xlim=false;
 		 this->xlim.first=x0;
@@ -143,11 +138,4 @@ void PgPlotPane::draw(){
 	  }
    }
 }
-
-char PgPlotPane::curs(float &x, float &y, uint_fast16_t mode, float xref, float yref){
-		 this->switchTo();
-		 char c;
-		 cpgband(mode,0,xref,yref,&x,&y,&c);
-		 return c;
-	  }
 
