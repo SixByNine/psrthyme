@@ -249,7 +249,11 @@ PsrthymeResult::Ptr PsrthymeFitter::fitTo(PsrthymeProfile::Ptr obs){
 
 	  logdbg("cut = %lf",chisq_cut);
 	  PsrthymeMatrix::Ptr uinv = PsrthymeMatrix::Ptr(new PsrthymeMatrix(nbins));
-	  cholesky_formUinv(uinv->c_arr(),covMatrix->c_arr(), nbins);
+	  if(cholesky_formUinv(uinv->c_arr(),covMatrix->c_arr(), nbins)){
+          result->failed=true;
+          return result;
+      }
+          
 
 	  //debug::plot(mconv*obs->getNormalisedProfile(),"pre fit filtered");
 	  //debug::plot(uinv*obs->getNormalisedProfile(),"pre fit white");

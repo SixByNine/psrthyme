@@ -31,7 +31,9 @@ class PsrthymeResult {
 	  double phase;
 	  double error;
 	  double chisq;
+      bool failed;
 	  PsrthymeResult() {
+          this->failed=false;
 	  };
 	  std::vector<double> best_profile;
 	  std::vector<double> residual;
