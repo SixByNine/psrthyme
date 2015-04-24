@@ -15,79 +15,82 @@
 #include <inttypes.h>
 #define grid_t boost::multi_array<PgPlotPane::Ptr, 2>
 class PgPlot {
-   private:
-	  double defaultColWidth;
-	  double defaultRowHeight;
-	  uint64_t nrow;
-	  uint64_t ncol;
-	  grid_t::extent_gen extents;
-	  std::string dev;
-	  grid_t grid;
-	  double maxsz;
-	  void reset();
-	  void fixPanes();
-      bool isopen;
-   public:
-	  enum PgColor {PAPER=0,INK=1,RED=2,GREEN=3,BLUE=4,
-		 CYAN=5,MAGENTA=6,YELLOW=7,
-	     ORANGE=8, GRASS=9, SEA=10, SKY=11, PURPLE=12, 
-		 PINK=13, DKGREY=14, LTGREY=15 };
+    private:
+        double defaultColWidth;
+        double defaultRowHeight;
+        uint64_t nrow;
+        uint64_t ncol;
+        grid_t::extent_gen extents;
+        std::string dev;
+        grid_t grid;
+        double maxsz;
+        void reset();
+        void fixPanes();
+        bool isopen;
+    public:
+        enum PgColor {PAPER=0,INK=1,RED=2,GREEN=3,BLUE=4,
+            CYAN=5,MAGENTA=6,YELLOW=7,
+            ORANGE=8, GRASS=9, SEA=10, SKY=11, PURPLE=12, 
+            PINK=13, DKGREY=14, LTGREY=15 };
 
-	  enum PgSymb {BOX=0, DOT=1, PLUS=2, ASTERIX=3,
-		 CIRCLE=4,CROSS=5, BOX2=6, TRIANGLE=7, OPLUS=8, ODOT=9,
-		 FLAREBOX=10, DIAMOND=11, STAR5=12, FILLTRIANGLE=13,
-		 OUTLINEPLUS=14, STAR6=15, FILLBOX=16, FILLCIRCLE=17,
-		 FILLSTAR5=18, BIGBOX=19, CIRCLE1=20, CIRCLE2=21, 
-		 CIRCLE3=22, CIRCLE4=23, CIRCLE5=24, CIRCLE6=25, CIRCLE7=26, 
-		 CIRCLE8=27,LEFT=28, RIGHT=29, UP=30, DOWN=31};
+        enum PgSymb {BOX=0, DOT=1, PLUS=2, ASTERIX=3,
+            CIRCLE=4,CROSS=5, BOX2=6, TRIANGLE=7, OPLUS=8, ODOT=9,
+            FLAREBOX=10, DIAMOND=11, STAR5=12, FILLTRIANGLE=13,
+            OUTLINEPLUS=14, STAR6=15, FILLBOX=16, FILLCIRCLE=17,
+            FILLSTAR5=18, BIGBOX=19, CIRCLE1=20, CIRCLE2=21, 
+            CIRCLE3=22, CIRCLE4=23, CIRCLE5=24, CIRCLE6=25, CIRCLE7=26, 
+            CIRCLE8=27,LEFT=28, RIGHT=29, UP=30, DOWN=31};
 
-	  enum PgCursMode {
-		 CURS_NONE=0,
-		 CURS_LINE=1,
-		 CURS_RECT=2,
-		 CURS_HBAND=3,
-		 CURS_VBAND=4,
-		 CURS_HLINE=5,
-		 CURS_VLINE=6,
-		 CURS_XHAIR=7
-	  };
+        enum PgCursMode {
+            CURS_NONE=0,
+            CURS_LINE=1,
+            CURS_RECT=2,
+            CURS_HBAND=3,
+            CURS_VBAND=4,
+            CURS_HLINE=5,
+            CURS_VLINE=6,
+            CURS_XHAIR=7
+        };
 
-	  typedef boost::shared_ptr<PgPlot> Ptr;
-	  PgPlot(); // constructor
-	  void createGrid(uint64_t nrow, uint64_t ncol);
-	  void show(bool keepopen=false);
-	  void show(std::string device,bool keepopen=false);
-	  PgPlotPane::Ptr getPane(uint64_t r, uint64_t c){
-		 r = nrow-r-1;
-		 //c = ncol-c-1;
-		 this->grid[r][c]->visible = true;
-		 return this->grid[r][c];
-	  }
-	  void setColWidth(uint64_t col, double width){
-		 this->defaultColWidth=this->maxsz*width;
-		 for(uint64_t irow = 0; irow< this->nrow; irow++){
-			this->grid[irow][col]->width=width;
-		 }
-		 this->fixPanes();
-	  }
-	  void setRowHeight(uint64_t row, double height){
-		 row = nrow-row-1;
-		 this->defaultRowHeight=this->maxsz*height;
-		 for(uint64_t icol = 0; icol<this->ncol; icol++){
-			this->grid[row][icol]->height=height;
-		 }
-		 this->fixPanes();
-	  }
-      char curs(float &x, float &y){
-          return this->curs(x,y,0,x,y);
-      }
-      char curs(float &x, float &y, uint_fast16_t mode, float xref, float yref);
-      void open();
-      void close();
+        typedef boost::shared_ptr<PgPlot> Ptr;
+        PgPlot(); // constructor
+        void createGrid(uint64_t nrow, uint64_t ncol);
+        void show(bool keepopen=false);
+        void show(std::string device,bool keepopen=false);
+        PgPlotPane::Ptr getPane(uint64_t r, uint64_t c){
+            r = nrow-r-1;
+            //c = ncol-c-1;
+            this->grid[r][c]->visible = true;
+            return this->grid[r][c];
+        }
+        void setColWidth(uint64_t col, double width){
+            this->defaultColWidth=this->maxsz*width;
+            for(uint64_t irow = 0; irow< this->nrow; irow++){
+                this->grid[irow][col]->width=width;
+            }
+            this->fixPanes();
+        }
+        void setRowHeight(uint64_t row, double height){
+            row = nrow-row-1;
+            this->defaultRowHeight=this->maxsz*height;
+            for(uint64_t icol = 0; icol<this->ncol; icol++){
+                this->grid[row][icol]->height=height;
+            }
+            this->fixPanes();
+        }
+        char curs(float &x, float &y){
+            return this->curs(x,y,0,x,y);
+        }
+        char curs(float &x, float &y, uint_fast16_t mode, float xref, float yref, PgColor c=INK);
+        void open();
+        void close();
 
-      void setDevice(std::string dev){
-          this->dev = dev;
-      }
+        void setDevice(std::string dev){
+            if(this->dev != dev){
+                this->close();
+            }
+            this->dev = dev;
+        }
 
 };
 
@@ -109,13 +112,12 @@ PgPlot::PgPlot() {
     this->ncol=1;
 }
 void PgPlot::open(){
-          if(this->isopen)this->close();
-          cpgopen(this->dev.c_str());
-          this->isopen = true;
-      }
-      void PgPlot::close(){
-          cpgclos();
-      }
+    if(!this->isopen) cpgopen(this->dev.c_str());
+    this->isopen = true;
+}
+void PgPlot::close(){
+    cpgclos();
+}
 
 void PgPlot::createGrid(uint64_t nrow, uint64_t ncol){
     this->defaultColWidth = this->maxsz/double(ncol);
@@ -166,24 +168,28 @@ void PgPlot::show(bool keepopen){
 }
 
 void PgPlot::show(std::string device, bool keepopen){
-    if(this->isopen)this->close();
-    cpgopen(device.c_str());
+    std::string olddev=this->dev;
+    this->setDevice(device);
+    this->open();
     cpgeras();
-    logmsg("show() nrow=%ld ncol=%ld",this->nrow,this->ncol);
+    logdbg("show() nrow=%ld ncol=%ld",this->nrow,this->ncol);
     for(uint64_t irow = 0; irow<this->nrow; irow++){
         for(uint64_t icol = 0; icol<this->ncol; icol++){
             this->reset();
             this->grid[irow][icol]->draw();
         }
     }
-    if(!keepopen)
+    if(!keepopen){
         this->close();
+    }
+    this->setDevice(olddev);
 }
 
 
 
-char PgPlot::curs(float &x, float &y, uint_fast16_t mode, float xref, float yref){
+char PgPlot::curs(float &x, float &y, uint_fast16_t mode, float xref, float yref, PgPlot::PgColor col){
     char c;
+    cpgsci(col);
     cpgband(mode,0,xref,yref,&x,&y,&c);
     return c;
 }

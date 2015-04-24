@@ -36,36 +36,122 @@ using std::vector;
 
 void PsrthymeTemplateEditor::run(){
     const uint64_t nbins = this->obsn->getNbins();
+    const uint64_t nfit = this->the_template->size()+1;
+
     float x=0,y=0;
-    char key=0;
+    char key='R'; // reset first go.
+    double phase=0.0;
+    float x1,x2;
+    vector<double> b_vector(nfit,1);
+    double baseline=0;
+    int selected_cmp=0;
 
-    while (true) {
+    PgPlot pgplot;
+    pgplot.createGrid(1,1);
+    PgPlotPane::Ptr mainPlot = pgplot.getPane(0,0);
+    while (key!='q') {
 
-        PsrthymeMatrix::Ptr dm = this->the_template->getDesignMatrix(nbins,0);
-        PgPlot pgplot;
-        pgplot.createGrid(1,1);
+        switch(key) {
+            case 'f':
+                {
+                    logmsg("Fit data to template");
+                    PsrthymeGenericFitter::Ptr fitter(new PsrthymeFitter());
+                    fitter->setTemplate(this->the_template);
+                    PsrthymeResult::Ptr result=fitter->fitTo(this->obsn);
+                    phase=result->phase;
+                    b_vector.swap(result->amp_values);
+                    baseline=b_vector[nfit-1];
+                    b_vector[nfit-1]=0;
+                }
+                break;
+            case 'R':
+                x1=-0.5;
+                x2=0.5;
+                {
+                    vector<double> newb(nfit,1);
+                    b_vector.swap(newb);
+                    b_vector[nfit-1]=0;
+                }
+                phase=0.0;
+                baseline=0.0;
+                break;
+            case 'z':
+                x1=x;
+                key=pgplot.curs(x,y,PgPlot::CURS_VBAND,x,y);
+                x2=x;
+                if ( x1 > x2) {
+                    x2=x1;
+                    x1=x;
+                }
+                break;
+            case ',':
+                selected_cmp -= 1;
+                break;
+            case '.':
+                selected_cmp += 1;
+                break;
+            default:
+                logmsg("unknown key: %d %c",key,key);
+                break;
+
+        }
+
+        if (selected_cmp > nfit-2) selected_cmp=0;
+        if (selected_cmp < 0) selected_cmp = nfit-2;
+        logmsg("Selected component id = %d",selected_cmp);
+
+        PsrthymeMatrix::Ptr dm = this->the_template->getDesignMatrix(nbins,phase);
 
         // Lower plot, it's the pulse profile
-        PgPlotPane::Ptr mainPlot = pgplot.getPane(0,0);
-        mainPlot->set_xlim(-0.5,0.5);
+        mainPlot->set_xlim(x1,x2);
+        mainPlot->datasets.clear();
 
-        vector<double> b_vector(dm->rows(),1);
-        b_vector[dm->rows()-1]=0;
         PgPlotData::Ptr profile = PgPlotData::blank();
-        mainPlot->datasets.push_back(profile);
         profile->x = obsn->getPhase();
         profile->y = obsn->getNormalisedProfile();
-
+        for (uint64_t bin=0; bin < nbins; bin++){
+            profile->y[bin] -= baseline;
+        }
 
         PgPlotData::Ptr tmpl = PgPlotData::blank();
         tmpl->x = obsn->getPhase();
         tmpl->y = dm*b_vector;
+
+        
+
+
+
+
+        vector<double> residual;
+        for (uint64_t bin=0; bin < nbins; bin++){
+            residual.push_back(profile->y[bin] - tmpl->y[bin]);
+        }
+        PgPlotData::Ptr resid = PgPlotData::blank();
+
+
+
+        resid->x = obsn->getPhase();
+        resid->y = residual;
+
+        mainPlot->datasets.push_back(profile);
+        mainPlot->datasets.push_back(resid);
+        for(size_t icmp=0; icmp < nfit-1; icmp++){
+            PgPlotData::Ptr cmp = PgPlotData::blank();
+            cmp->x = obsn->getPhase();
+            vector<double> b_alt(nfit,0);
+            b_alt[icmp]=b_vector[icmp];
+            cmp->y = dm*b_alt;
+            cmp->setPlotType(PgPlotData::LINE);
+            cmp->lineColorIndex=PgPlot::DKGREY;
+            if(icmp==selected_cmp){
+            cmp->lineColorIndex=PgPlot::ORANGE;
+            }
+            mainPlot->datasets.push_back(cmp);
+        }
+
         mainPlot->datasets.push_back(tmpl);
 
-        PgPlotData::Ptr resid = PgPlotData::blank();
-        //  resid->x = obsn->getPhase();
-        //resid->y = residual;
-        //  mainPlot->datasets.push_back(resid);
+
         mainPlot->xlab="Phase";
         mainPlot->ylab="Amplitude";
 
@@ -73,8 +159,8 @@ void PsrthymeTemplateEditor::run(){
         profile->setPlotType(PgPlotData::HIST);
         profile->lineColorIndex=PgPlot::SKY;
 
-        tmpl->setPlotType(PgPlotData::HIST);
-        tmpl->lineColorIndex=PgPlot::SEA;
+        tmpl->setPlotType(PgPlotData::LINE);
+        tmpl->lineColorIndex=PgPlot::GREEN;
 
         resid->setPlotType(PgPlotData::HIST);
         resid->lineColorIndex=PgPlot::RED;
