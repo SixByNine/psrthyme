@@ -1,3 +1,0 @@
-#!/bin/bash
-./clean_all
-./bootstrap && ./doconfigure O && make clean && make -j4 && make install
